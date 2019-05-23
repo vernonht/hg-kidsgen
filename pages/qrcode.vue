@@ -7,7 +7,7 @@
       <span class="mx-auto mb-10">{{ detected }}</span>
       <div class="mx-auto">
           <button class="button--grey" @click="detected = ''">
-              Rescan Barcode
+              Rescan QR Code
           </button>
       </div>
   </div>
@@ -29,6 +29,7 @@ export default {
   },
   methods: {
     onDecode (decodedString) {
+        this.detected = decodedString
       console.log('detected', decodedString)
     }
 
