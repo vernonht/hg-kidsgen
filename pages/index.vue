@@ -20,9 +20,13 @@
           class="button--grey"
         >GitHub</a>
         <nuxt-link
-          to="/attendance"
+          to="/barcode"
           class="button--grey"
         >Scan Barcode</nuxt-link>
+        <nuxt-link
+          to="/qrcode"
+          class="button--grey"
+        >Scan QR Code</nuxt-link>
       </div>
     </div>
   </section>

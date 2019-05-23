@@ -35,7 +35,8 @@ export default {
   */
   plugins: [
     '~/plugins/element',
-    '~/plugins/quagga'
+    '~/plugins/quagga',
+    '~/plugins/qrcode'
   ],
 
   /*
