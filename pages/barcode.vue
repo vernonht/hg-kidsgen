@@ -1,5 +1,5 @@
 <template>
-  <div class="flex" v-if="detected == ''">
+  <div class="" v-if="detected == ''">
     <v-quagga :onDetected="logIt" :readerSize="readerSize" :readerTypes="readerTypes"></v-quagga>
   </div>
   <div class="flex flex-col my-10" v-else>
