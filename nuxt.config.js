@@ -2,7 +2,9 @@ import pkg from './package'
 
 export default {
   mode: 'spa',
-
+  server: {
+      port: 8000
+  },
   /*
   ** Headers of the page
   */
@@ -34,7 +36,9 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    '~/plugins/element',
+    '~/plugins/axios',
+    '~/plugins/moment',
+    '~/plugins/ant',
     '~/plugins/quagga',
     '~/plugins/qrcode'
   ],
