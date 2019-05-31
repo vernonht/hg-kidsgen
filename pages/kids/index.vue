@@ -1,8 +1,8 @@
 <template>
   <section class="container flex flex-wrap py-10">
-      <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, xl: 4 }" :dataSource="kids">
-          <a-list-item slot="renderItem" slot-scope="item, index">
-              <a-spin :spinning="loading">
+      <a-spin tip="Loading..." :spinning="loading">
+          <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, xl: 4 }" :dataSource="kids">
+              <a-list-item slot="renderItem" slot-scope="item, index">
                   <a-card hoverable class="group">
                       <img :src="item.picture" alt="" slot="cover">
                       <a-card-meta :title="item.name">
@@ -22,9 +22,9 @@
                           <a-icon type="edit" @click="$router.push(`/kids/${item.id}`)"/>
                       </template>
                   </a-card>
-              </a-spin>
-          </a-list-item>
-      </a-list>
+              </a-list-item>
+          </a-list>
+      </a-spin>
   </section>
 </template>
 
