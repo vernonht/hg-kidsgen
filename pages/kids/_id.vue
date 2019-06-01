@@ -58,7 +58,7 @@
                     <a-input v-decorator="[ 'name', {rules: [{ required: true, message: 'Name is required!' }]} ]"/>
                 </a-form-item>
                 <a-form-item label="Contact" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
-                    <a-input v-decorator="[ 'contact', {rules: [{ required: true, type: 'number', message: 'Contact is not valid!' }]} ]"/>
+                    <a-input v-decorator="[ 'contact', {rules: [{ required: true, message: 'Contact is not valid!' }]} ]"/>
                 </a-form-item>
                 <a-form-item label="Email" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
                     <a-input v-decorator="[ 'email', {rules: [{ required: true, type: 'email', message: 'Email is not valid!' }]} ]"/>
@@ -72,9 +72,28 @@
                 </a-button>
             </template>
             <div class="h-64 overflow-auto">
-                <a-list class="demo-loadmore-list" :loading="loading" itemLayout="horizontal" :dataSource="parents_list">
+                <a-form :form="edit_parents" v-if="edit_parent_id.length > 0">
+                    <a-form-item label="Name" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
+                        <a-input v-decorator="[ 'name', {rules: [{ required: true, message: 'Name is required!' }]} ]"/>
+                    </a-form-item>
+                    <a-form-item label="Contact" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
+                        <a-input v-decorator="[ 'contact', {rules: [{ required: true, message: 'Contact is not valid!' }]} ]"/>
+                    </a-form-item>
+                    <a-form-item label="Email" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
+                        <a-input v-decorator="[ 'email', {rules: [{ required: true, type: 'email', message: 'Email is not valid!' }]} ]"/>
+                    </a-form-item>
+                    <div class="flex justify-center">
+                        <a-button class="mr-4" @click="editParent('cancel')" :loading="add_parent_loading">
+                            Cancel
+                        </a-button>
+                        <a-button type="primary" @click="editParent('submit')" :loading="add_parent_loading">
+                            Save
+                        </a-button>
+                    </div>
+                </a-form>
+                <a-list class="demo-loadmore-list" :loading="loading" itemLayout="horizontal" :dataSource="parents_list" v-else>
                     <a-list-item slot="renderItem" slot-scope="item, index">
-                        <a slot="actions">edit</a>
+                        <a slot="actions"><span @click="editParent('show', item)">Edit</span></a>
                         <a slot="actions">
                             <a-popconfirm title="Are you sure?" @confirm="deleteParent(item.id)" okText="Yes" cancelText="No">
                                 <a>Delete</a>
@@ -82,7 +101,7 @@
                         </a>
                         <a-list-item-meta>
                             <a slot="title">{{item.name}}</a>
-                            <a-avatar slot="avatar" src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                            <a-avatar slot="avatar" :src="item.picture" />
                         </a-list-item-meta>
                     </a-list-item>
                 </a-list>
@@ -118,6 +137,8 @@ export default {
             selected_parents: [],
             form: this.$form.createForm(this),
             add_parents: this.$form.createForm(this),
+            edit_parents: this.$form.createForm(this),
+            edit_parent_id: '',
             loading: true,
             add_parent_loading: false,
             add_parents_modal: false,
@@ -130,8 +151,6 @@ export default {
     },
     methods: {
         filterOption(input, option) {
-            // console.warn(option);
-            // console.warn(option.componentOptions.children[1].text);
             return option.componentOptions.children[1].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
         },
         onSearch(value) {
@@ -144,6 +163,34 @@ export default {
                 return true
             } else {
                 return false
+            }
+        },
+        editParent(action, data) {
+            if(action == 'show') {
+                this.edit_parent_id = data.id
+                this.$nextTick(() => {
+                    this.edit_parents.setFieldsValue({
+                        name: data.name,
+                        contact: data.contact,
+                        email: data.email
+                    });
+                })
+            } else if (action == 'submit') {
+                this.edit_parents.validateFields((err, values) => {
+                  if (!err) {
+                    console.log('Received values of form: ', values);
+                    this.$axios.put(`/parents/${this.edit_parent_id}`, values)
+                    .then((res) => {
+                        this.$message.success(`Updated parent's info`, 2);
+                        this.getParentsInfo();
+                        this.edit_parents.resetFields();
+                        this.edit_parent_id = ''
+                    })
+                  }
+                });
+            } else if (action == 'cancel') {
+                this.edit_parents.resetFields();
+                this.edit_parent_id = ''
             }
         },
         deleteParent(id) {

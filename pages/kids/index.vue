@@ -20,6 +20,9 @@
                       </a-card-meta>
                       <template class="ant-card-actions" slot="actions">
                           <a-icon type="edit" @click="$router.push(`/kids/${item.id}`)"/>
+                          <a-popconfirm :title="`Delete ${item.name}?`" @confirm="deleteKid(item)" okText="Yes" cancelText="No">
+                              <a-icon type="delete"/>
+                          </a-popconfirm>
                       </template>
                   </a-card>
               </a-list-item>
@@ -30,11 +33,12 @@
 
 <script>
 import Vue from 'vue'
-import { List, Card, Spin } from 'ant-design-vue'
+import { List, Card, Spin, Popconfirm } from 'ant-design-vue'
 
 Vue.use(List);
 Vue.use(Card);
 Vue.use(Spin);
+Vue.use(Popconfirm);
 
 export default {
     components: {
@@ -46,14 +50,24 @@ export default {
         }
     },
     mounted() {
-        this.$axios.get('/kids')
-        .then((res) => {
-            console.warn(res);
-            this.kids = res.data
-            this.loading = false
-        })
+        this.getKidsListing()
     },
     methods: {
+        deleteKid(data){
+            this.$axios.delete(`/kids/${data.id}`,)
+            .then((res) => {
+                this.$message.success(`Deleted ${data.name}`, 2);
+                this.getKidsListing()
+            })
+        },
+        getKidsListing(){
+            this.$axios.get('/kids')
+            .then((res) => {
+                console.warn(res);
+                this.kids = res.data
+                this.loading = false
+            })
+        },
         diff(date){
             let a = this.$moment();
             let b = this.$moment(date);
