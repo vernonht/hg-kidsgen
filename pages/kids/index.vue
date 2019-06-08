@@ -19,6 +19,7 @@
                           </template>
                       </a-card-meta>
                       <template class="ant-card-actions" slot="actions">
+                          <a-icon type="qrcode" @click="manageQRModal(item)"/>
                           <a-icon type="edit" @click="$router.push(`/kids/${item.id}`)"/>
                           <a-popconfirm :title="`Delete ${item.name}?`" @confirm="deleteKid(item)" okText="Yes" cancelText="No">
                               <a-icon type="delete"/>
@@ -28,6 +29,22 @@
               </a-list-item>
           </a-list>
       </a-spin>
+      <a-modal :title="modal_data.name" v-model="manage_qr_modal" @ok="manage_qr_modal = !manage_qr_modal">
+          <template slot="footer">
+              <a-button key="submit" type="primary" @click="manage_qr_modal = !manage_qr_modal">
+                  Check in/out
+              </a-button>
+              <a-button key="submit" type="primary" @click="manage_qr_modal = !manage_qr_modal">
+                  Resend QR Code
+              </a-button>
+              <a-button key="submit" type="primary" @click="manage_qr_modal = !manage_qr_modal">
+                  Close
+              </a-button>
+          </template>
+          <div class="h-64 overflow-auto">
+              {{ modal_data.name }}
+          </div>
+      </a-modal>
   </section>
 </template>
 
@@ -46,6 +63,8 @@ export default {
     data() {
         return {
             kids: [],
+            modal_data: {},
+            manage_qr_modal: false,
             loading: true
         }
     },
@@ -53,6 +72,10 @@ export default {
         this.getKidsListing()
     },
     methods: {
+        manageQRModal(data) {
+            this.modal_data = data
+            this.manage_qr_modal = true
+        },
         deleteKid(data){
             this.$axios.delete(`/kids/${data.id}`,)
             .then((res) => {
