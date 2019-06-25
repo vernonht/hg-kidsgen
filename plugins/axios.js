@@ -3,7 +3,8 @@ import axios from 'axios';
 
 // const Cookie = process.client ? require('js-cookie') : undefined
 const instance = axios.create({
-  baseURL: 'https://5ceb602d77d47900143b889c.mockapi.io/',
+  baseURL: 'http://hg-backend.test/',
+  // baseURL: 'https://5ceb602d77d47900143b889c.mockapi.io/',
   // headers: {'Authorization': 'Bearer ' + Cookie.get('accessToken')}
 })
 

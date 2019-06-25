@@ -40,7 +40,8 @@ export default {
     '~/plugins/moment',
     '~/plugins/ant',
     '~/plugins/quagga',
-    '~/plugins/qrcode'
+    '~/plugins/qrcode',
+    '~/plugins/cropper'
   ],
 
   /*

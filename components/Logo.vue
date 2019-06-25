@@ -1,10 +1,13 @@
 <template>
-  <div class="VueToNuxtLogo">
+    <div class="flex justify-center">
+        <img src="/harvestgen.png" class="w-48 h-48" alt="">
+    </div>
+  <!-- <div class="VueToNuxtLogo">
     <div class="Triangle Triangle--two" />
     <div class="Triangle Triangle--one" />
     <div class="Triangle Triangle--three" />
     <div class="Triangle Triangle--four" />
-  </div>
+  </div> -->
 </template>
 
 <style>

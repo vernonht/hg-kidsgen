@@ -67,6 +67,7 @@ export default {
             this.form.validateFields((err, values) => {
                 if (!err) {
                     console.log('Received values of form: ', values);
+                    // this.$store.commit('token/add', e.target.value)
                 }
             });
         },

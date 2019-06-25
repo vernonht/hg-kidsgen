@@ -1,20 +1,30 @@
 <template>
   <section class="container flex flex-wrap py-10">
       <a-spin tip="Loading..." :spinning="loading">
+          <div class="flex justify-end mb-4">
+              <nuxt-link to="/kids/create">
+                  <a-button type="primary">
+                      Add new kid
+                  </a-button>
+              </nuxt-link>
+          </div>
           <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, xl: 4 }" :dataSource="kids">
               <a-list-item slot="renderItem" slot-scope="item, index">
                   <a-card hoverable class="group">
-                      <img :src="item.picture" alt="" slot="cover">
+                      <img :src="'http://hg-backend.test/'+item.picture" alt="" slot="cover">
                       <a-card-meta :title="item.name">
                           <template slot="description">
                               <div class="flex">
                                   <span class="w-16 text-left">Gender:</span>{{ item.gender }}
                               </div>
                               <div class="flex">
-                                  <span class="w-16 text-left">DOB:</span>{{ item.dob | moment('DD-MM-YYYY') }}
+                                  <span class="w-16 text-left">DOB:</span>{{ item.birthdate | moment('DD-MM-YYYY') }}
                               </div>
                               <div class="flex">
-                                  <span class="w-16 text-left">Age:</span>{{ diff(item.dob) }}
+                                  <span class="w-16 text-left">Age:</span>{{ diff(item.birthdate) }}
+                              </div>
+                              <div class="flex">
+                                  <span class="w-16 text-left">Allergies:</span>{{ item.allergies }}
                               </div>
                           </template>
                       </a-card-meta>
@@ -31,18 +41,28 @@
       </a-spin>
       <a-modal :title="modal_data.name" v-model="manage_qr_modal" @ok="manage_qr_modal = !manage_qr_modal">
           <template slot="footer">
-              <a-button key="submit" type="primary" @click="manage_qr_modal = !manage_qr_modal">
+              <a-button class="mb-2" type="primary" @click="manage_qr_modal = !manage_qr_modal">
                   Check in/out
               </a-button>
-              <a-button key="submit" type="primary" @click="manage_qr_modal = !manage_qr_modal">
+              <a-button class="mb-2" type="primary" @click="manage_qr_modal = !manage_qr_modal">
                   Resend QR Code
               </a-button>
-              <a-button key="submit" type="primary" @click="manage_qr_modal = !manage_qr_modal">
+              <a-button class="mb-2" type="primary" @click="manage_qr_modal = !manage_qr_modal">
                   Close
               </a-button>
           </template>
           <div class="h-64 overflow-auto">
               {{ modal_data.name }}
+              <img :src="modal_data.barcode" alt="">
+              <input type="file" name="image" accept="image/*" @change="setImage" />
+              <vue-cropper
+              ref="cropper"
+              src="https://s3.reutersmedia.net/resources/r/?d=20190502&i=RCV006O97&w=&r=RCV006O97&t=2"
+              drag-mode="crop"
+              :aspectRatio="3 / 4"
+              :view-mode="2"
+              :auto-crop-area="0.5"
+              alt="Source Image"></vue-cropper>
           </div>
       </a-modal>
   </section>
@@ -51,6 +71,8 @@
 <script>
 import Vue from 'vue'
 import { List, Card, Spin, Popconfirm } from 'ant-design-vue'
+import VueCropper from 'vue-cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 Vue.use(List);
 Vue.use(Card);
@@ -59,6 +81,7 @@ Vue.use(Popconfirm);
 
 export default {
     components: {
+        VueCropper
     },
     data() {
         return {
@@ -72,6 +95,24 @@ export default {
         this.getKidsListing()
     },
     methods: {
+        setImage(e) {
+            const file = e.target.files[0];
+            if (!file.type.includes('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+            if (typeof FileReader === 'function') {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    this.imgSrc = event.target.result;
+                    // rebuild cropperjs with the updated source
+                    this.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Sorry, FileReader API not supported');
+            }
+        },
         manageQRModal(data) {
             this.modal_data = data
             this.manage_qr_modal = true

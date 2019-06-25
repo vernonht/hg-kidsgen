@@ -17,6 +17,7 @@
     "cross-env": "^5.2.0",
     "element-ui": "^2.8.2",
     "nuxt": "^2.7.1",
+    "vue-cropperjs": "^4.0.0",
     "vue-moment": "^4.0.0",
     "vue-multiselect": "^2.1.6",
     "vue-qrcode-reader": "^2.0.1",

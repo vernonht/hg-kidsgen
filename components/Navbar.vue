@@ -7,6 +7,16 @@
             <login :showLogin="showLogin" @modal="handleModal"/>
             <div>
                 <a-drawer title="Menu" :placement="placement" :closable="false" @close="onClose" :visible="visible">
+                    <nuxt-link to="/">
+                        <div class="hover:text-blue-600 cursor-pointer">
+                            Home
+                        </div>
+                    </nuxt-link>
+                    <nuxt-link to="/qrcode">
+                        <div class="hover:text-blue-600 cursor-pointer">
+                            Check In/Out
+                        </div>
+                    </nuxt-link>
                     <nuxt-link to="/kids">
                         <div class="hover:text-blue-600 cursor-pointer">
                             Kids
