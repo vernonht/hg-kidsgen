@@ -1,6 +1,6 @@
 <template>
   <section class="container flex flex-wrap py-10">
-      <a-spin tip="Loading..." :spinning="loading">
+      <a-spin class="w-full" tip="Loading..." :spinning="loading">
           <div class="flex justify-end mb-4">
               <nuxt-link to="/kids/create">
                   <a-button type="primary">
@@ -8,10 +8,48 @@
                   </a-button>
               </nuxt-link>
           </div>
-          <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, xl: 4 }" :dataSource="kids">
+          <div class="flex flex-col md:flex-row border shadow-md md:h-56 mb-4" v-for="(item, index) in kids">
+              <div class="md:w-1/4 flex items-center overflow-hidden">
+                  <img :src="item.picture" alt="" slot="cover">
+              </div>
+              <div class="md:w-3/4 p-6 my-auto">
+                  <div class="flex">
+                      <span class="w-16 text-left">Name:</span>{{ item.name }}
+                  </div>
+                  <div class="flex">
+                      <span class="w-16 text-left">Gender:</span>{{ item.gender }}
+                  </div>
+                  <div class="flex">
+                      <span class="w-16 text-left">DOB:</span>{{ item.birthdate | moment('DD-MM-YYYY') }}
+                  </div>
+                  <div class="flex">
+                      <span class="w-16 text-left">Age:</span>{{ diff(item.birthdate) }}
+                  </div>
+                  <div class="flex mb-4">
+                      <span class="w-16 text-left">Allergies:</span>{{ item.allergies }}
+                  </div>
+                  <div class="flex my-auto">
+                      <button type="button" name="button" class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 mr-4" @click="manageQRModal(item)">
+                          <a-icon type="qrcode"/>
+                          <span class="pl-2">Show QR</span>
+                      </button>
+                      <button type="button" name="button" class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 mr-4" @click="$router.push(`/kids/${item.id}`)">
+                          <a-icon type="edit"/>
+                          <span class="pl-2">Edit Info</span>
+                      </button>
+                      <a-popconfirm :title="`Delete ${item.name}?`" @confirm="deleteKid(item)" okText="Yes" cancelText="No">
+                          <div class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 cursor-pointer">
+                              <a-icon type="delete"/>
+                              <span class="pl-2">Delete</span>
+                          </div>
+                      </a-popconfirm>
+                  </div>
+              </div>
+          </div>
+          <!-- <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, xl: 4 }" :dataSource="kids">
               <a-list-item slot="renderItem" slot-scope="item, index">
                   <a-card hoverable class="group">
-                      <img :src="'http://hg-backend.test/'+item.picture" alt="" slot="cover">
+                      <img :src="item.picture" alt="" slot="cover">
                       <a-card-meta :title="item.name">
                           <template slot="description">
                               <div class="flex">
@@ -37,12 +75,15 @@
                       </template>
                   </a-card>
               </a-list-item>
-          </a-list>
+          </a-list> -->
       </a-spin>
       <a-modal :title="modal_data.name" v-model="manage_qr_modal" @ok="manage_qr_modal = !manage_qr_modal">
           <template slot="footer">
-              <a-button class="mb-2" type="primary" @click="manage_qr_modal = !manage_qr_modal">
-                  Check in/out
+              <a-button class="mb-2" type="primary" @click="adminCheckIn('check_in')">
+                  Check In
+              </a-button>
+              <a-button class="mb-2" type="primary" @click="adminCheckIn('check_out')">
+                  Check Out
               </a-button>
               <a-button class="mb-2" type="primary" @click="manage_qr_modal = !manage_qr_modal">
                   Resend QR Code
@@ -51,18 +92,8 @@
                   Close
               </a-button>
           </template>
-          <div class="h-64 overflow-auto">
-              {{ modal_data.name }}
-              <img :src="modal_data.barcode" alt="">
-              <input type="file" name="image" accept="image/*" @change="setImage" />
-              <vue-cropper
-              ref="cropper"
-              src="https://s3.reutersmedia.net/resources/r/?d=20190502&i=RCV006O97&w=&r=RCV006O97&t=2"
-              drag-mode="crop"
-              :aspectRatio="3 / 4"
-              :view-mode="2"
-              :auto-crop-area="0.5"
-              alt="Source Image"></vue-cropper>
+          <div class="flex justify-center">
+              <img :src="modal_data.barcode_number" class="w-full" alt="">
           </div>
       </a-modal>
   </section>
@@ -83,6 +114,7 @@ export default {
     components: {
         VueCropper
     },
+    middleware: 'authenticated',
     data() {
         return {
             kids: [],
@@ -95,6 +127,23 @@ export default {
         this.getKidsListing()
     },
     methods: {
+        adminCheckIn(action) {
+            let cta = ''
+            if(action == 'check_in'){
+                cta = 'in'
+            } else {
+                cta = 'out'
+            }
+            this.$axios.post(`access/admin`, {
+                kid_id: this.modal_data.id,
+                action: action
+            })
+            .then((res) => {
+                this.$message.success(`${this.modal_data.name} has check ${cta} successfully`, 2);
+                console.warn(res.data);
+                this.manage_qr_modal = false
+            })
+        },
         setImage(e) {
             const file = e.target.files[0];
             if (!file.type.includes('image/')) {

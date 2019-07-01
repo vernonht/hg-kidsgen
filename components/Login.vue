@@ -2,7 +2,7 @@
     <a-modal title="Login" :footer="null" v-model="visible" :afterClose="handleClose">
         <a-form :form="form" @submit="handleSubmit" >
             <a-form-item :validate-status="userNameError() ? 'error' : ''" :help="userNameError() || ''" >
-                <a-input v-decorator="[ 'userName', {rules: [{ required: true, message: 'Please input your username!' }]} ]" placeholder="Username" >
+                <a-input v-decorator="[ 'email', {rules: [{ required: true, message: 'Please input your email!' }]} ]" placeholder="Email" >
                     <a-icon slot="prefix" type="user" style="color:rgba(0,0,0,.25)" />
                 </a-input>
             </a-form-item>
@@ -67,7 +67,20 @@ export default {
             this.form.validateFields((err, values) => {
                 if (!err) {
                     console.log('Received values of form: ', values);
-                    // this.$store.commit('token/add', e.target.value)
+                    this.$axios.post(`/login`, {
+                        email: values.email,
+                        password: values.password
+                    })
+                    .then((res) => {
+                        // console.warn(res.data.success.token);
+                        this.$store.commit('token/add', res.data.success.token)
+                        this.$store.commit('user/add', res.data.user)
+                        this.$message.success(`${res.data.user.name} has logged in successfully`, 2);
+                        location.href = '/kids'
+                    })
+                    .catch((e)=> {
+                        this.$message.error(`${e}`, 2);                        
+                    })
                 }
             });
         },

@@ -3,14 +3,15 @@
         <a-spin tip="Loading..." :spinning="loading">
             <a-form :form="form">
                 <a-form-item label="Picture" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
-                    <input type="file" name="image" accept="image/*" @change="setImage" />
+                    <!-- <input type="file" name="image" accept="image/*" @change="setImage" /> -->
+                    <input type="file" accept="image/*;capture=camera" @change="setImage">
                     <img :src="kid_picture" style="max-height: 300px" alt="">
                 </a-form-item>
                 <a-form-item label="Name" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
                     <a-input v-decorator="[ 'name', {rules: [{ required: true, message: 'Name is required!' }]} ]"/>
                 </a-form-item>
                 <a-form-item label="Gender" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
-                    <a-select v-decorator="[ 'gender', {rules: [{ required: true, message: 'Please select gender!' }]} ]" placeholder="Select a option and change input text above">
+                    <a-select showSearch v-decorator="[ 'gender', {rules: [{ required: true, message: 'Please select gender!' }]} ]" placeholder="Select a option and change input text above">
                         <a-select-option value="male">
                             male
                         </a-select-option>
@@ -29,7 +30,7 @@
                 <a-form-item label="Parents" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
                     <a-select mode="multiple" showSearch optionFilterProp="children" optionLabelProp="value" :filterOption="filterOption" v-decorator="[ 'parents', {rules: [{ required: false, message: 'Please select parents!' }]} ]" placeholder="Select parents">
                         <a-select-option :value="i.name" v-for="i in parents_list" :key="i.id">
-                            <a-avatar size="large" :src="i.picture"/>
+                            <!-- <a-avatar size="large" :src="i.picture"/> -->
                             {{ i.name }}
                         </a-select-option>
                     </a-select>
@@ -85,10 +86,10 @@
                     <a-form-item label="Email" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
                         <a-input v-decorator="[ 'email', {rules: [{ required: true, type: 'email', message: 'Email is not valid!' }]} ]"/>
                     </a-form-item>
-                    <a-form-item label="Picture" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
+                    <!-- <a-form-item label="Picture" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
                         <input type="file" name="image" accept="image/*" @change="setParentImage" />
                         <img :src="parent_picture" style="max-height: 300px" alt="">
-                    </a-form-item>
+                    </a-form-item> -->
                     <div class="flex justify-center">
                         <a-button class="mr-4" @click="editParent('cancel')" :loading="add_parent_loading">
                             Cancel
@@ -108,7 +109,7 @@
                         </a>
                         <a-list-item-meta>
                             <a slot="title">{{item.name}}</a>
-                            <a-avatar slot="avatar" :src="item.picture" />
+                            <!-- <a-avatar slot="avatar" :src="item.picture" /> -->
                         </a-list-item-meta>
                     </a-list-item>
                 </a-list>
@@ -299,7 +300,7 @@ export default {
                 if (!err) {
                     this.add_parent_loading = true
                     console.log('Received values of form: ', values);
-                    this.$axios.post(`/parents/`, values)
+                    this.$axios.post(`/parents`, values)
                     .then((res) => {
                         this.$message.success(`Added ${values['name']} to the parent list`, 2);
                         this.add_parents_modal = false
@@ -328,7 +329,7 @@ export default {
                     gender: res.data.gender,
                     allergies: res.data.allergies,
                 });
-                this.kid_picture = 'http://hg-backend.test/'+res.data.picture
+                this.kid_picture = res.data.picture
                 this.getParentsInfo()
                 this.loading = false
             })
