@@ -2,13 +2,16 @@
   <section class="container">
     <div>
       <logo />
-      <h1 class="title">
-        hg-kidsgen
-      </h1>
-      <h2 class="subtitle">
+      <!-- <h1 class="title">
+        KidsGen
+      </h1> -->
+      <!-- <h2 class="subtitle">
         Kidsgen attendance system
-      </h2>
-      <div class="links">
+      </h2> -->
+      <div class="">
+          <nuxt-link to="/qrcode" class="button--grey" >Check In / Out</nuxt-link>
+      </div>
+      <div class="hidden links">
         <a
           href="https://nuxtjs.org/"
           target="_blank"

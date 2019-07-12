@@ -3,21 +3,25 @@ import pkg from './package'
 export default {
   mode: 'spa',
   server: {
-      port: 8000
+      port: 8000,
+      host: '0.0.0.0'
   },
   /*
   ** Headers of the page
   */
   head: {
-    title: pkg.name,
-    meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: pkg.description }
-    ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+      title: pkg.name,
+      meta: [
+          { charset: 'utf-8' },
+          { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+          { hid: 'description', name: 'description', content: pkg.description }
+      ],
+      link: [
+          { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      ],
+      script: [
+          { src: 'https://code.jquery.com/jquery-3.4.1.min.js' }
+      ],
   },
 
   /*
@@ -40,7 +44,9 @@ export default {
     '~/plugins/moment',
     '~/plugins/ant',
     '~/plugins/quagga',
-    '~/plugins/qrcode'
+    '~/plugins/qrcode',
+    '~/plugins/cropper',
+    '~/plugins/lodash'
   ],
 
   /*
