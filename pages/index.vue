@@ -5,9 +5,9 @@
       <!-- <h1 class="title">
         KidsGen
       </h1> -->
-      <h2 class="subtitle">
+      <!-- <h2 class="subtitle">
         Kidsgen attendance system
-      </h2>
+      </h2> -->
       <div class="">
           <nuxt-link to="/qrcode" class="button--grey" >Check In / Out</nuxt-link>
       </div>

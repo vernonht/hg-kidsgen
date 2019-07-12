@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center">
-        <img src="/harvestgen.png" class="w-48 h-48" alt="">
+        <img src="/kidsgen_logo.png" class="w-56 h-56" alt="">
     </div>
   <!-- <div class="VueToNuxtLogo">
     <div class="Triangle Triangle--two" />

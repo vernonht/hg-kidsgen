@@ -9,14 +9,27 @@
                 Loading data
             </div>
             <div class="mx-auto" v-else>
-                <div class="flex items-center mx-auto mb-4 w-48 h-48 overflow-hidden">
+                <div class="flex items-center mx-auto mb-4 w-56 h-56 overflow-hidden">
                     <img :src="kid.picture" alt="">
                 </div>
                 <div class="flex justify-center mb-4">
-                    <span class="w-16 text-center">Name:</span>{{ kid.name }}
+                    <span class="w-1/2 text-right pr-2">Name:</span>
+                    <span class="w-1/2 text-left">{{ kid.name }}</span>
+                </div>
+                <div class="flex justify-center mb-4">
+                    <span class="w-1/2 text-right pr-2">Gender:</span>
+                    <span class="w-1/2 text-left">{{ kid.gender }}</span>
+                </div>
+                <div class="flex justify-center mb-4">
+                    <span class="w-1/2 text-right pr-2">Birth Date:</span>
+                    <span class="w-1/2 text-left">{{ kid.birthdate }}</span>
+                </div>
+                <div class="flex justify-center mb-4">
+                    <span class="w-1/2 text-right pr-2">Allergies:</span>
+                    <span class="w-1/2 text-left">{{ kid.allergies }}</span>
                 </div>
                 <div class="mx-auto">
-                    <button class="button--grey" @click="detected = ''">
+                    <button class="button--grey" @click="rescan()">
                         Rescan QR Code
                     </button>
                     <button class="button--grey" :disabled="action.length == 0" @click="manageAttendance()">
@@ -46,6 +59,11 @@ export default {
     }
   },
   methods: {
+      rescan() {
+          this.detected = ''
+          this.kid = {}
+          this.loading = true
+      },
       manageAttendance() {
           let action = ''
           switch (this.action) {

@@ -45,7 +45,8 @@ export default {
     '~/plugins/ant',
     '~/plugins/quagga',
     '~/plugins/qrcode',
-    '~/plugins/cropper'
+    '~/plugins/cropper',
+    '~/plugins/lodash'
   ],
 
   /*

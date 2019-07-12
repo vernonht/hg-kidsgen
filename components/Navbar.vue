@@ -36,6 +36,13 @@
                             </div>
                         </nuxt-link>
                     </div>
+                    <div class="" @click="visible = false">
+                        <nuxt-link to="/stats">
+                            <div class="border-b px-4 py-2 hover:bg-gray-200 trans cursor-pointer">
+                                Stats
+                            </div>
+                        </nuxt-link>
+                    </div>
                 </a-drawer>
             </div>
     </div>

@@ -3,7 +3,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 // const Cookie = process.client ? require('js-cookie') : undefined
 const instance = axios.create({
-  baseURL: location.host == 'kids.harvestgen.org' ? 'https://backend.harvestgen.org/' : 'http://hg-backend.test/',
+  baseURL: 'https://backend.harvestgen.org/',
+  // baseURL: location.host == 'kids.harvestgen.org' ? 'https://backend.harvestgen.org/' : 'http://hg-backend.test/',
   // baseURL: 'https://5ceb602d77d47900143b889c.mockapi.io/',
   headers: {'Authorization': 'Bearer ' + Cookies.get('token')}
 })
