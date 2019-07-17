@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center">
-        <img src="/kidsgen_logo.png" class="w-56 h-56" alt="">
+        <img src="/kidsgen_logo.png" class="w-full md:w-56 h-auto" alt="">
     </div>
   <!-- <div class="VueToNuxtLogo">
     <div class="Triangle Triangle--two" />

@@ -1,7 +1,7 @@
 {
-  "name": "hg-kidsgen",
+  "name": "Kidsgen",
   "version": "1.0.0",
-  "description": "Kidsgen attendance system",
+  "description": "Kidsgen check in/out web",
   "author": "HarvestGen",
   "private": true,
   "scripts": {

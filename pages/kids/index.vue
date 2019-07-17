@@ -1,5 +1,5 @@
 <template>
-  <section class="container flex flex-wrap py-10">
+  <section class="container flex flex-wrap px-4 py-10">
       <a-spin class="w-full" tip="Loading..." :spinning="loading">
           <div class="flex justify-center mb-4">
               <nuxt-link to="/kids/create">
@@ -8,7 +8,7 @@
                   </a-button>
               </nuxt-link>
           </div>
-          <div class="flex flex-col md:flex-row bg-white border shadow-md md:h-56 mb-4" v-for="(item, index) in kids">
+          <div class="flex flex-col md:flex-row bg-white rounded-lg shadow-md hover:shadow-lg md:h-56 mb-4 trans" v-for="(item, index) in kids">
               <div class="md:w-1/4 flex items-center justify-center border border-r overflow-hidden">
                   <img :src="item.picture" alt="" slot="cover">
               </div>
@@ -70,32 +70,40 @@
               <img :src="modal_data.barcode_number" class="w-full" alt="">
           </div>
       </a-modal>
-      <a-modal :title="modal_data.name" v-model="attendance_modal" @ok="attendance_modal = !attendance_modal">
+      <a-modal :title="modal_data.name" v-model="attendance_modal" :width="700" @ok="attendance_modal = !attendance_modal">
           <template slot="footer">
               <a-button class="mb-2" type="primary" @click="attendance_modal = !attendance_modal">
                   Close
               </a-button>
           </template>
-          <div class="px-4 mb-4" v-for="(item, key) in attendance_data">
-              <h4>{{ key }}</h4>
-              <table :id="`attendance${key}`" class="attendance w-full border bg-white">
-                  <tr class="border">
-                      <th>Check In Time</th>
-                      <th>Check In Method</th>
-                      <th>Check Out Time</th>
-                      <th>Check Out Method</th>
-                  </tr>
-                  <tr class="border">
-                      <td>{{ convertToTime(_.get(_.find(item, {'action': 'check_in'}), 'created_at')) }}</td>
-                      <td>{{ _.get(_.find(item, {'action': 'check_in'}), 'checkin_method') || '-' }}</td>
-                      <td>{{ convertToTime(_.get(_.find(item, {'action': 'check_out'}), 'created_at')) }}</td>
-                      <td>{{ _.get(_.find(item, {'action': 'check_out'}), 'checkin_method') || '-' }}</td>
-                  </tr>
-              </table>
+          <div class="flex justify-center mb-4">
+              <h4 class="border border-black rounded-lg font-bold text-xl px-8 py-1">Latest 5 attendance records</h4>
+          </div>
+          <div class="px-4 mb-10" v-for="(item, key) in attendance_data" v-if="!_.isEmpty(attendance_data)">
+              <div class="flex">
+                  <h4 class="border border-black rounded-lg font-bold text-xl px-8 py-1">{{ key }}</h4>
+              </div>
+              <ul :id="`attendance${key}`" class="attendance w-full bg-white">
+                  <li class="table-header">
+                      <span>Check In Time</span>
+                      <span>Check In Method</span>
+                      <span>Check Out Time</span>
+                      <span>Check Out Method</span>
+                  </li>
+                  <li class="table-row trans">
+                      <span>{{ convertToTime(_.get(_.find(item, {'action': 'check_in'}), 'created_at')) }}</span>
+                      <span>{{ _.get(_.find(item, {'action': 'check_in'}), 'checkin_method') || '-' }}</span>
+                      <span>{{ convertToTime(_.get(_.find(item, {'action': 'check_out'}), 'created_at')) }}</span>
+                      <span>{{ _.get(_.find(item, {'action': 'check_out'}), 'checkin_method') || '-' }}</span>
+                  </li>
+              </ul>
               <!-- <div class="flex justify-end py-2">
                   <button type="button" class="bg-white border rounded px-4 py-1 mr-2" @click="doit('attendance'+key, 'csv')">Export to CSV</button>
                   <button type="button" class="bg-white border rounded px-4 py-1" @click="doit('attendance'+key, 'xlsx')">Export to XLSX</button>
               </div> -->
+          </div>
+          <div class="flex justify-center px-4 mb-4" v-if="_.isEmpty(attendance_data)">
+              No data
           </div>
       </a-modal>
   </section>
@@ -232,37 +240,62 @@ export default {
 <style>
 /* Sample `apply` at-rules with Tailwind CSS
 .container {
-  @apply min-h-screen flex justify-center items-center text-center mx-auto;
+@apply min-h-screen flex justify-center items-center text-center mx-auto;
 }
 */
 .container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+    font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
+    display: block;
+    font-weight: 300;
+    font-size: 100px;
+    color: #35495e;
+    letter-spacing: 1px;
 }
 
 .subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
+    font-weight: 300;
+    font-size: 42px;
+    color: #526488;
+    word-spacing: 5px;
+    padding-bottom: 15px;
 }
 
 .links {
-  padding-top: 15px;
+    padding-top: 15px;
+}
+
+.table-header {
+    display: flex;
+    background-color: #95A5A6;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    @apply font-bold rounded mb-4 text-white;
+}
+
+.table-header span, .table-row span {
+    width: 25%;
+    padding: 15px;
+}
+
+.table-row {
+    display: flex;
+    background-color: #ffffff;
+    box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.1);
+    @apply mb-4;
+}
+
+.table-row:hover {
+    background-color: #eee;
 }
 </style>

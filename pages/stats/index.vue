@@ -2,9 +2,26 @@
   <section class="container flex mx-auto py-10">
       <a-spin class="w-full" tip="Loading..." :spinning="loading">
           <!-- <bar-chart :datacollection="datacollection" v-if="!loading"/> -->
-          <line-chart :datacollection="datacollection2" v-if="!loading"/>
-          <div class="px-4 mb-4" v-for="(item, key) in attendance">
-              <h4>{{ key }}</h4>
+          <div class="px-4">
+              <line-chart :datacollection="datacollection2" v-if="!loading"/>
+          </div>
+          <div class="flex justify-end px-4 my-4">
+              <a-select
+              size="large"
+              mode="multiple"
+              placeholder="Filter Kid"
+              optionFilterProp="children"
+              allowClear
+              @change="handleChange"
+              style="width: 400px"
+              >
+              <a-select-option :value="i.id" v-for="i in kids" :key="i.id">{{ i.name }}</a-select-option>
+          </a-select>
+          </div>
+          <div class="overflow-auto px-4 mb-4" v-for="(item, key) in attendance">
+              <div class="flex">
+                  <h4 class="border border-black rounded-lg font-bold text-xl px-8 py-1">{{ key }}</h4>
+              </div>
               <table :id="`attendance${key}`" class="attendance w-full border bg-white">
                   <tr class="border">
                       <th>Kid Name</th>
@@ -13,22 +30,22 @@
                       <th>Check Out Time</th>
                       <th>Check Out Method</th>
                   </tr>
-                  <tr class="border" v-for="(x, index) in item">
+                  <tr class="border trans" v-for="(x, index) in item">
                       <td>{{ _.head(x).kid.name }}</td>
                       <td>{{ convertToTime(_.get(_.find(x, {'action': 'check_in'}), 'created_at')) }}</td>
                       <td>{{ _.get(_.find(x, {'action': 'check_in'}), 'checkin_method') || '-' }}</td>
                       <td>{{ convertToTime(_.get(_.find(x, {'action': 'check_out'}), 'created_at')) }}</td>
                       <td>{{ _.get(_.find(x, {'action': 'check_out'}), 'checkin_method') || '-' }}</td>
                   </tr>
-                  <tr class="border">
+                  <tr class="border trans">
                       <td>Total:</td>
                       <td :colspan="3"></td>
                       <td>{{ Object.keys(item).length }} {{Object.keys(item).length > 1 ? 'kids' : 'kid'}}</td>
                   </tr>
               </table>
               <div class="flex justify-end py-2">
-                  <button type="button" class="bg-white border rounded px-4 py-1 mr-2" @click="doit('attendance'+key, 'csv')">Export to CSV</button>
-                  <button type="button" class="bg-white border rounded px-4 py-1" @click="doit('attendance'+key, 'xlsx')">Export to XLSX</button>
+                  <button type="button" class="bg-white border rounded px-8 py-1 mr-2" @click="doit('attendance'+key, 'csv')">Export to CSV</button>
+                  <button type="button" class="bg-white border rounded px-8 py-1" @click="doit('attendance'+key, 'xlsx')">Export to XLSX</button>
               </div>
           </div>
       </a-spin>
@@ -37,7 +54,7 @@
 
 <script>
 import Vue from 'vue'
-import { List, Card, Spin, Popconfirm } from 'ant-design-vue'
+import { List, Card, Spin, Popconfirm, Select } from 'ant-design-vue'
 import BarChart from '@/components/BarChart'
 import LineChart from '@/components/LineChart'
 import XLSX from 'xlsx';
@@ -46,6 +63,7 @@ Vue.use(List);
 Vue.use(Card);
 Vue.use(Spin);
 Vue.use(Popconfirm);
+Vue.use(Select);
 
 export default {
     components: {
@@ -59,12 +77,20 @@ export default {
             datacollection: {},
             datacollection2: {},
             loading: true,
+            date_filter: '',
+            kid_ids: [],
+            kids: []
         }
     },
     mounted() {
+        this.getKids()
         this.getStats()
     },
     methods: {
+        handleChange (value) {
+            console.warn(value);
+            this.getStats('', value)
+        },
         doit(id, type, fn, dl) {
             var elt = document.getElementById(id);
             var wb = XLSX.utils.table_to_book(elt, {sheet:"Sheet JS"});
@@ -79,11 +105,21 @@ export default {
                 return '-'
             }
         },
-        getStats(){
-            this.$axios.get('/stats/kid_id')
+        getKids() {
+            this.$axios.get('/kids')
+            .then((res) => {
+                this.kids = res.data
+            })
+        },
+        getStats(dateFilter, kidFilter) {
+            this.$axios.post('/stats', {
+                filter: '',
+                kid: kidFilter || []
+            })
             .then((res) => {
                 let grouped_data = []
                 let data = []
+                this.attendance = {}
                 _.forEach(res.data, (value, key)=> {
                     this.attendance[key] = _.groupBy(value, 'kid_id');
                     data.push(Object.keys(this.attendance[key]).length)
