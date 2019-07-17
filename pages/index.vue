@@ -9,7 +9,7 @@
         Kidsgen attendance system
       </h2> -->
       <div class="">
-          <nuxt-link to="/qrcode" class="button--grey" >Check In / Out</nuxt-link>
+          <nuxt-link to="/qrcode" class="button--grey mx-4" >Check In / Out</nuxt-link>
       </div>
       <div class="hidden links">
         <a
@@ -58,7 +58,7 @@ export default {
 */
 .container {
   margin: 0 auto;
-  min-height: 100vh;
+  min-height: calc(100vh - 50px);
   display: flex;
   justify-content: center;
   align-items: center;
