@@ -81,9 +81,16 @@ export default {
               action: action
           })
           .then((res) => {
-              this.$message.success(`${this.kid.name} has check ${this.action.toLowerCase()} successfully`, 2);
-              console.warn(res.data);
-              this.$router.push('/')
+              this.$Swal.fire({
+                  type: 'success',
+                  text: `${this.kid.name} has check ${this.action.toLowerCase()} successfully`,
+                  showConfirmButton: false,
+                  timer: 2000
+              }).then(()=> {
+                  this.$router.push('/')
+              });
+              // this.$message.success(`${this.kid.name} has check ${this.action.toLowerCase()} successfully`, 2);
+              // console.warn(res.data);
           })
       },
       onDecode (decodedString) {

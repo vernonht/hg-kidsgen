@@ -78,14 +78,31 @@ export default {
                         this.loggingin = false
                         this.$store.commit('token/add', res.data.success.token)
                         this.$store.commit('user/add', res.data.user)
-                        this.$message.success(`${res.data.user.name} has logged in successfully`, 2);
-                        location.href = '/kids'
+                        this.$Swal.fire({
+                            type: 'success',
+                            text: `${res.data.user.name} has logged in successfully`,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(()=> {
+                            location.href = '/kids'
+                        });
+                        // this.$message.success(`${res.data.user.name} has logged in successfully`, 2);
                     })
                     .catch((e)=> {
                         if(e.response.status == 401) {
-                            this.$message.error(`Invalid email or password`, 2);
+                            this.$Swal.fire({
+                              type: 'error',
+                              title: 'Oops...',
+                              text: 'Invalid email or password!'
+                            })
+                            // this.$message.error(`Invalid email or password`, 2);
                         } else {
-                            this.$message.error(`${e}`, 2);
+                            this.$Swal.fire({
+                              type: 'error',
+                              title: 'Oops...',
+                              text: `${e}`
+                            })
+                            // this.$message.error(`${e}`, 2);
                         }
                         this.loggingin = false
                     })

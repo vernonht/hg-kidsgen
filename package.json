@@ -19,6 +19,7 @@
     "element-ui": "^2.8.2",
     "js-cookie": "^2.2.0",
     "nuxt": "^2.7.1",
+    "sweetalert2": "^8.14.0",
     "vue-chartjs": "^3.4.2",
     "vue-cropperjs": "^4.0.0",
     "vue-lodash": "^2.0.2",

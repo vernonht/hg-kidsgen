@@ -64,7 +64,7 @@
               <a-button class="mb-2" type="primary" @click="adminCheckIn('check_out')">
                   Check Out
               </a-button>
-              <a-button class="mb-2" type="primary" @click="resendQR()">
+              <a-button class="mb-2" type="primary" :loading="resend_qr" @click="resendQR()">
                   Resend QR Code
               </a-button>
               <a-button class="mb-2" type="primary" @click="manage_qr_modal = !manage_qr_modal">
@@ -137,6 +137,7 @@ export default {
             manage_qr_modal: false,
             attendance_data: [],
             attendance_modal: false,
+            resend_qr: false,
             loading: true
         }
     },
@@ -168,10 +169,18 @@ export default {
             }
         },
         resendQR() {
-            // console.warn(this.modal_data.id);
+            this.resend_qr = true
             this.$axios.get(`resendQR/${this.modal_data.id}`)
             .then((res) => {
-                this.$message.success(`QR code sent`, 2);
+                this.$Swal.fire({
+                    type: 'success',
+                    text: `QR code sent`,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(()=> {
+                    this.resend_qr = false
+                })
+                // this.$message.success(`QR code sent`, 2);
                 // console.warn(res.data);
             })
         },
@@ -187,9 +196,16 @@ export default {
                 action: action
             })
             .then((res) => {
-                this.$message.success(`${this.modal_data.name} has check ${cta} successfully`, 2);
+                this.$Swal.fire({
+                    type: 'success',
+                    text: `${this.modal_data.name} has check ${cta} successfully`,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(()=> {
+                    this.manage_qr_modal = false
+                });
+                // this.$message.success(`${this.modal_data.name} has check ${cta} successfully`, 2);
                 // console.warn(res.data);
-                this.manage_qr_modal = false
             })
         },
         setImage(e) {
@@ -227,8 +243,15 @@ export default {
         deleteKid(data){
             this.$axios.delete(`/kids/${data.id}`,)
             .then((res) => {
-                this.$message.success(`Deleted ${data.name}`, 2);
-                this.getKidsListing()
+                this.$Swal.fire({
+                    type: 'success',
+                    text: `Deleted ${data.name}`,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(()=> {
+                    this.getKidsListing()
+                });
+                // this.$message.success(`Deleted ${data.name}`, 2);
             })
         },
         getKidsListing(){

@@ -47,7 +47,8 @@ export default {
     '~/plugins/quagga',
     '~/plugins/qrcode',
     '~/plugins/cropper',
-    '~/plugins/lodash'
+    '~/plugins/lodash',
+    '~/plugins/sweet-alert'
   ],
 
   /*

@@ -210,7 +210,13 @@ export default {
               });
               this.$axios.post(`/photos/`, formData)
               .then((res) => {
-                  this.$message.success(`Picture uploaded`, 2);
+                  this.$Swal.fire({
+                      type: 'success',
+                      text: `Picture uploaded`,
+                      showConfirmButton: false,
+                      timer: 2000
+                  })
+                  // this.$message.success(`Picture uploaded`, 2);
               })
             // if (info.file.status === 'done') {
             //     // Get this url from response in real world.
@@ -310,11 +316,18 @@ export default {
                             return this.$axios.post(`/photos`, form)
                         })
                         .then((res) => {
-                            this.$message.success(`Updated parent's info`, 2);
-                            this.getParentsInfo();
-                            this.add_parent_loading = false
-                            this.edit_parents.resetFields();
-                            this.edit_parent_id = ''
+                            this.$Swal.fire({
+                                type: 'success',
+                                text: `Updated parent's info`,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(()=> {
+                                this.getParentsInfo();
+                                this.add_parent_loading = false
+                                this.edit_parents.resetFields();
+                                this.edit_parent_id = ''
+                            });
+                            // this.$message.success(`Updated parent's info`, 2);
                         })
                     }
                 })
@@ -327,8 +340,15 @@ export default {
             console.warn(id);
             this.$axios.delete(`/parents/${id}`,)
             .then((res) => {
-                this.$message.success(`Deleted`, 2);
-                this.getParentsInfo()
+                this.$Swal.fire({
+                    type: 'success',
+                    text: `Deleted parent`,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(()=> {
+                    this.getParentsInfo()
+                });
+                // this.$message.success(`Deleted`, 2);
             })
         },
         addParent(e) {
@@ -339,17 +359,34 @@ export default {
                     console.log('Received values of form: ', values);
                     this.$axios.post(`/parents`, values)
                     .then((res) => {
-                        this.$message.success(`Added ${values['name']} to the parent list`, 2);
-                        this.add_parents_modal = false
-                        this.add_parent_loading = false
-                        this.add_parents.resetFields();
-                        this.getParentsInfo()
+                        this.$Swal.fire({
+                            type: 'success',
+                            text: `Added ${values['name']} to the parent list`,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(()=> {
+                            this.add_parents_modal = false
+                            this.add_parent_loading = false
+                            this.add_parents.resetFields();
+                            this.getParentsInfo()
+                        });
+                        // this.$message.success(`Added ${values['name']} to the parent list`, 2);
                     })
                     .catch((e)=> {
                         if(e.response.data.errors.email) {
-                            this.$message.error(`${e.response.data.errors.email}`, 2);
+                            this.$Swal.fire({
+                              type: 'error',
+                              title: 'Oops...',
+                              text: `${e.response.data.errors.email}`
+                            })
+                            // this.$message.error(`${e.response.data.errors.email}`, 2);
                         } else {
-                            this.$message.error(`Server could not precess the request`, 2);
+                            this.$Swal.fire({
+                              type: 'error',
+                              title: 'Oops...',
+                              text: `Server could not precess the request`
+                            })
+                            // this.$message.error(`Server could not precess the request`, 2);
                         }
                         this.add_parent_loading = false
                     })
@@ -426,13 +463,25 @@ export default {
                       return this.$axios.post(`/photos`, form)
                   })
                   .then((res) => {
-                      this.$message.success(`Added ${values['name']} into system`, 2);
-                      this.submitting = false
-                      this.$router.push('/kids')
-                      console.warn(res.data);
+                      this.$Swal.fire({
+                          type: 'success',
+                          text: `Added ${values['name']} into system`,
+                          showConfirmButton: false,
+                          timer: 2000
+                      }).then(()=> {
+                          this.submitting = false
+                          this.$router.push('/kids')
+                          console.warn(res.data);
+                      });
+                      // this.$message.success(`Added ${values['name']} into system`, 2);
                   })
                   .catch((e)=> {
-                      this.$message.error(`${e}`, 2);
+                      this.$Swal.fire({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: `${e}`
+                      })
+                      // this.$message.error(`${e}`, 2);
                       this.submitting = false
                   })
               } else {
@@ -445,13 +494,25 @@ export default {
                       return this.$axios.post(`/photos`, form)
                   })
                   .then((res) => {
-                      this.$message.success(`Updated ${values['name']}'s info`, 2);
-                      this.submitting = false
-                      this.$router.push('/kids')
-                      console.warn(res.data);
+                      this.$Swal.fire({
+                          type: 'success',
+                          text: `Updated ${values['name']}'s info`,
+                          showConfirmButton: false,
+                          timer: 2000
+                      }).then(()=> {
+                          this.submitting = false
+                          this.$router.push('/kids')
+                          console.warn(res.data);
+                      });
+                      // this.$message.success(`Updated ${values['name']}'s info`, 2);
                   })
                   .catch((e)=> {
-                      this.$message.error(`${e}`, 2);
+                      this.$Swal.fire({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: `${e}`
+                      })
+                      // this.$message.error(`${e}`, 2);
                       this.submitting = false
                   })
               }
