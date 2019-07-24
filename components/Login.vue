@@ -12,7 +12,7 @@
                 </a-input>
             </a-form-item>
             <a-form-item>
-                <a-button type="primary" html-type="submit" :disabled="hasErrors(form.getFieldsError())" >
+                <a-button type="primary" html-type="submit" :loading="loggingin" :disabled="hasErrors(form.getFieldsError())" >
                     Log in
                 </a-button>
             </a-form-item>
@@ -37,7 +37,8 @@ export default {
         return {
             hasErrors,
             form: this.$form.createForm(this),
-            visible: false
+            visible: false,
+            loggingin: false
         };
     },
     watch: {
@@ -66,6 +67,7 @@ export default {
             e.preventDefault();
             this.form.validateFields((err, values) => {
                 if (!err) {
+                    this.loggingin = true
                     console.log('Received values of form: ', values);
                     this.$axios.post(`/login`, {
                         email: values.email,
@@ -73,13 +75,19 @@ export default {
                     })
                     .then((res) => {
                         // console.warn(res.data.success.token);
+                        this.loggingin = false
                         this.$store.commit('token/add', res.data.success.token)
                         this.$store.commit('user/add', res.data.user)
                         this.$message.success(`${res.data.user.name} has logged in successfully`, 2);
                         location.href = '/kids'
                     })
                     .catch((e)=> {
-                        this.$message.error(`${e}`, 2);                        
+                        if(e.response.status == 401) {
+                            this.$message.error(`Invalid email or password`, 2);
+                        } else {
+                            this.$message.error(`${e}`, 2);
+                        }
+                        this.loggingin = false
                     })
                 }
             });

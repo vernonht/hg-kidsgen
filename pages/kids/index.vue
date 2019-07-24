@@ -2,11 +2,16 @@
   <section class="container flex flex-wrap px-4 py-10">
       <a-spin class="w-full" tip="Loading..." :spinning="loading">
           <div class="flex justify-center mb-4">
-              <nuxt-link to="/kids/create">
-                  <a-button type="primary">
-                      Add new kid
-                  </a-button>
-              </nuxt-link>
+              <div class="">
+                  <a-input-search placeholder="Search kids" style="width: 200px" @search="search"/>
+              </div>
+              <div class="ml-auto">
+                  <nuxt-link to="/kids/create">
+                      <a-button type="primary">
+                          Add new kid
+                      </a-button>
+                  </nuxt-link>
+              </div>
           </div>
           <div class="flex flex-col md:flex-row bg-white rounded-lg shadow-md hover:shadow-lg md:h-56 mb-4 trans" v-for="(item, index) in kids">
               <div class="md:w-1/4 flex items-center justify-center border border-r overflow-hidden">
@@ -139,6 +144,15 @@ export default {
         this.getKidsListing()
     },
     methods: {
+        search(value) {
+            this.loading = true
+            this.$axios.get(`search/${value}`)
+            .then((res) => {
+                // console.warn(res.data);
+                this.kids = res.data
+                this.loading = false
+            })
+        },
         doit(id, type, fn, dl) {
             var elt = document.getElementById(id);
             var wb = XLSX.utils.table_to_book(elt, {sheet:"Sheet JS"});
@@ -154,11 +168,11 @@ export default {
             }
         },
         resendQR() {
-            console.warn(this.modal_data.id);
+            // console.warn(this.modal_data.id);
             this.$axios.get(`resendQR/${this.modal_data.id}`)
             .then((res) => {
                 this.$message.success(`QR code sent`, 2);
-                console.warn(res.data);
+                // console.warn(res.data);
             })
         },
         adminCheckIn(action) {
@@ -174,7 +188,7 @@ export default {
             })
             .then((res) => {
                 this.$message.success(`${this.modal_data.name} has check ${cta} successfully`, 2);
-                console.warn(res.data);
+                // console.warn(res.data);
                 this.manage_qr_modal = false
             })
         },
@@ -206,7 +220,7 @@ export default {
             });
 
             let grouped = _.groupBy(data, 'date');
-            console.warn(grouped);
+            // console.warn(grouped);
             this.attendance_data = grouped
             this.attendance_modal = true
         },
@@ -220,7 +234,7 @@ export default {
         getKidsListing(){
             this.$axios.get('/kids')
             .then((res) => {
-                console.warn(res);
+                // console.warn(res);
                 this.kids = res.data
                 this.loading = false
             })
