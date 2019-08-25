@@ -5,6 +5,29 @@
                 <a-form-item label="Picture" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
                     <!-- <input type="file" name="image" accept="image/*" @change="setImage" /> -->
                     <input type="file" accept="image/*;capture=camera" @change="setImage">
+                    <!-- <div class="flex">
+                        <croppa
+                            v-model="croppa"
+                            :width="200"
+                            :height="266"
+                            :show-remove-button="true"
+                            remove-button-color="black"
+                            :zoom-speed="5"
+                            :disable-drag-to-move="!show_croppa_btn"
+                            :disable-pinch-to-zoom="!show_croppa_btn"
+                            @file-choose="show_croppa_btn = true">
+                            <img crossOrigin="anonymous" :src="cropped_picture" slot="initial">
+                        </croppa>
+                    </div>
+                    <div class="my-4" v-if="show_croppa_btn">
+                        <button class="border rounded bg-white px-4 m-2" @click="croppa.moveUpwards(10)">Move up</button>
+                        <button class="border rounded bg-white px-4 m-2" @click="croppa.moveDownwards(10)">Move down</button>
+                        <button class="border rounded bg-white px-4 m-2" @click="croppa.moveLeftwards(10)">Move left</button>
+                        <button class="border rounded bg-white px-4 m-2" @click="croppa.moveRightwards(10)">Move right</button>
+                        <button class="border rounded bg-white px-4 m-2" @click="croppa.zoomIn()">Zoom In</button>
+                        <button class="border rounded bg-white px-4 m-2" @click="croppa.zoomOut()">Zoom Out</button>
+                        <a-button type="primary" @click="imageToBlob" class="mx-2">Crop</a-button>
+                    </div> -->
                     <div class="" v-if="cropping">
                         <vue-cropper
                         ref='cropper'
@@ -184,7 +207,9 @@ export default {
             cropping: false,
             cropped_picture: '',
             parent_picture: '',
-            parent_picture_file: ''
+            parent_picture_file: '',
+            croppa: '',
+            show_croppa_btn: false
         }
     },
     mounted() {
@@ -196,6 +221,18 @@ export default {
         }
     },
     methods: {
+        imageToBlob() {
+            this.croppa.generateBlob(
+                blob => {
+                    // write code to upload the cropped image file (a file is a blob)
+                    this.kid_picture_file = blob
+                },
+                'image/jpeg',
+                0.8
+            ); // 80% compressed jpeg file
+            this.cropped_picture = this.croppa.generateDataUrl()
+            this.show_croppa_btn = false
+        },
         handleChange (info) {
             if (info.file.status === 'uploading') {
                 this.uploading = true
@@ -218,13 +255,6 @@ export default {
                   })
                   // this.$message.success(`Picture uploaded`, 2);
               })
-            // if (info.file.status === 'done') {
-            //     // Get this url from response in real world.
-            //     getBase64(info.file.originFileObj, (imageUrl) => {
-            //         this.imageUrl = imageUrl
-            //         this.uploading = false
-            //     })
-            // }
         },
         setParentImage(e) {
             const file = e.target.files[0];
@@ -270,9 +300,11 @@ export default {
             // get image data preview
             this.cropped_picture = this.$refs.cropper.getCroppedCanvas().toDataURL();
             // get image data for server upload
-            this.$refs.cropper.getCroppedCanvas().toBlob((blob)=> {
+            this.$refs.cropper.getCroppedCanvas({width: 600, height: 800}).toBlob((blob)=> {
                 this.kid_picture_file = blob
-            });
+            },
+            'image/jpeg',
+            0.8);
             this.cropping = false
         },
         rotate(val) {
@@ -457,7 +489,9 @@ export default {
                   this.$axios.post(`/kids`, values)
                   .then((res) => {
                       let form = new FormData();
-                      form.append('picture', this.kid_picture_file)
+                      if(this.kid_picture_file) {
+                          form.append('picture', this.kid_picture_file)
+                      }
                       form.append('id', res.data.id)
                       form.append('type', 'kid')
                       return this.$axios.post(`/photos`, form)
@@ -488,7 +522,9 @@ export default {
                   this.$axios.put(`/kids/${this.id}`, values)
                   .then((res) => {
                       let form = new FormData();
-                      form.append('picture', this.kid_picture_file)
+                      if(this.kid_picture_file) {
+                          form.append('picture', this.kid_picture_file)
+                      }
                       form.append('id', res.data.id)
                       form.append('type', 'kid')
                       return this.$axios.post(`/photos`, form)
@@ -537,4 +573,8 @@ export default {
   align-items: center;
   text-align: center;
 }
+.croppa-container {
+   border: 2px solid grey;
+   border-radius: 8px;
+ }
 </style>
