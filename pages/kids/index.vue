@@ -14,7 +14,7 @@
               </div>
           </div>
           <div class="flex flex-col md:flex-row bg-white rounded-lg shadow-md hover:shadow-lg md:h-56 mb-4 trans" v-for="(item, index) in kids">
-              <div class="md:w-1/4 flex items-center justify-center border border-r overflow-hidden">
+              <div class="md:w-1/4 flex items-start justify-center border border-r overflow-hidden">
                   <img :src="item.picture" alt="" slot="cover">
               </div>
               <div class="md:w-3/4 p-6 my-auto">
@@ -38,7 +38,7 @@
                           <a-icon type="qrcode"/>
                           <span class="pl-2">Show QR</span>
                       </button>
-                      <button type="button" name="button" class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 mb-4 md:mr-4" @click="attendanceModal(item.attendance)">
+                      <button type="button" name="button" class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 mb-4 md:mr-4" @click="attendanceModal(item)">
                           <a-icon type="check-square"/>
                           <span class="pl-2">Attendance</span>
                       </button>
@@ -163,7 +163,7 @@ export default {
         },
         convertToTime(val) {
             if(val) {
-                return this.$moment(val).format('hh:mm')
+                return this.$moment.utc(val).local().format('hh:mm')
             } else {
                 return '-'
             }
@@ -231,12 +231,12 @@ export default {
             this.manage_qr_modal = true
         },
         attendanceModal(data) {
-            _.forEach(data, (value)=> {
+            this.modal_data = data
+            _.forEach(data.attendance, (value)=> {
                 value.date = this.$moment(value.created_at).format('YYYY-MM-DD')
             });
 
-            let grouped = _.groupBy(data, 'date');
-            // console.warn(grouped);
+            let grouped = _.groupBy(data.attendance, 'date');
             this.attendance_data = grouped
             this.attendance_modal = true
         },

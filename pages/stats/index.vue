@@ -31,7 +31,7 @@
                       <th>Check Out Method</th>
                   </tr>
                   <tr class="border trans" v-for="(x, index) in item">
-                      <td>{{ _.head(x).kid.name }}</td>
+                      <td>{{ _.get(_.head(x), ['kid', 'name']) }}</td>
                       <td>{{ convertToTime(_.get(_.find(x, {'action': 'check_in'}), 'created_at')) }}</td>
                       <td>{{ _.get(_.find(x, {'action': 'check_in'}), 'checkin_method') || '-' }}</td>
                       <td>{{ convertToTime(_.get(_.find(x, {'action': 'check_out'}), 'created_at')) }}</td>
