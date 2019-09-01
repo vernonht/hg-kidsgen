@@ -22,7 +22,7 @@
                       <span class="w-16 text-left">Name:</span>{{ item.name }}
                   </div>
                   <div class="flex">
-                      <span class="w-16 text-left">Gender:</span>{{ item.gender }}
+                      <span class="w-16 text-left">Gender:</span>{{ _.capitalize(item.gender) }}
                   </div>
                   <div class="flex">
                       <span class="w-16 text-left">DOB:</span>{{ item.birthdate | moment('DD-MM-YYYY') }}

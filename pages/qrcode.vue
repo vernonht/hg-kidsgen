@@ -24,6 +24,10 @@
                     <span class="w-1/2 text-right pr-2">Birth Date:</span>
                     <span class="w-1/2 text-left">{{ kid.birthdate }}</span>
                 </div>
+                <div class="flex justify-center mb-4" v-if="getWeek(kid.birthdate)">
+                    <span class="w-1/2 text-left"></span>
+                    <span class="w-1/2 text-left text-red-600">{{ getWeek(kid.birthdate) }}</span>
+                </div>
                 <div class="flex justify-center mb-4">
                     <span class="w-1/2 text-right pr-2">Allergies:</span>
                     <span class="w-1/2 text-left">{{ kid.allergies }}</span>
@@ -59,6 +63,11 @@ export default {
     }
   },
   methods: {
+      getWeek(date) {
+          if(this.$moment(date, "YYYY-MM-DD").week() == this.$moment().week() ) {
+              return 'Birthday is this week!'
+          }
+      },
       rescan() {
           this.detected = ''
           this.kid = {}

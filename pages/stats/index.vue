@@ -100,7 +100,7 @@ export default {
         },
         convertToTime(val) {
             if(val) {
-                return this.$moment(val).format('hh:mm')
+                return this.$moment.utc(val).local().format('hh:mm')
             } else {
                 return '-'
             }

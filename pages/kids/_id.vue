@@ -56,10 +56,10 @@
                 <a-form-item label="Gender" :label-col="{ span: 6 }" :wrapper-col="{ span: 12 }">
                     <a-select showSearch v-decorator="[ 'gender', {rules: [{ required: true, message: 'Please select gender!' }]} ]" placeholder="Select a option and change input text above">
                         <a-select-option value="male">
-                            male
+                            Male
                         </a-select-option>
                         <a-select-option value="female">
-                            female
+                            Female
                         </a-select-option>
                     </a-select>
                 </a-form-item>
@@ -183,6 +183,7 @@ export default {
         Multiselect,
         VueCropper
     },
+    middleware: 'authenticated',
     data() {
         return {
             id: this.$route.params.id,
