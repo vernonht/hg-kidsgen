@@ -82,7 +82,7 @@
               </a-button>
           </template>
           <div class="flex justify-center mb-4">
-              <h4 class="border border-black rounded-lg font-bold text-xl px-8 py-1">Latest 5 attendance records</h4>
+              <h4 class="border border-black rounded-lg font-bold text-xl px-8 py-1">Attendance records</h4>
           </div>
           <div class="px-4 mb-10" v-for="(item, key) in attendance_data" v-if="!_.isEmpty(attendance_data)">
               <div class="flex">
@@ -90,16 +90,19 @@
               </div>
               <ul :id="`attendance${key}`" class="attendance w-full bg-white">
                   <li class="table-header">
-                      <span>Check In Time</span>
-                      <span>Check In Method</span>
-                      <span>Check Out Time</span>
-                      <span>Check Out Method</span>
+                      <span>Date time</span>
+                      <span>Action</span>
                   </li>
-                  <li class="table-row trans">
-                      <span>{{ convertToTime(_.get(_.find(item, {'action': 'check_in'}), 'created_at')) }}</span>
-                      <span>{{ _.get(_.find(item, {'action': 'check_in'}), 'checkin_method') || '-' }}</span>
-                      <span>{{ convertToTime(_.get(_.find(item, {'action': 'check_out'}), 'created_at')) }}</span>
-                      <span>{{ _.get(_.find(item, {'action': 'check_out'}), 'checkin_method') || '-' }}</span>
+                  <li class="table-row trans" v-for="item2 in item">
+                      <span class="flex items-center">{{ convertToTime(_.get(item2, 'created_at')) }}</span>
+                      <span class="flex items-center">
+                          <div class="">
+                              {{ _.capitalize(_.get(item2, 'checkin_method')) }} {{ _.replace(_.get(item2, 'action'), '_', ' ') }}
+                          </div>
+                          <div class="flex items-center ml-auto">
+                              <a-icon type="edit" class="cursor-pointer" @click="editAttendanceModal(item2)"/>
+                          </div>
+                      </span>
                   </li>
               </ul>
               <!-- <div class="flex justify-end py-2">
@@ -110,6 +113,18 @@
           <div class="flex justify-center px-4 mb-4" v-if="_.isEmpty(attendance_data)">
               No data
           </div>
+      </a-modal>
+      <a-modal title="Attendance" :visible="edit_attendance_modal" :confirmLoading="loading" @ok="editAttendance" @cancel="edit_attendance_modal = false">
+          <p>{{ edit_attendance_data }}</p>
+          <el-date-picker v-model="edit_attendance_data.created_at" type="datetime" placeholder="Select date and time"></el-date-picker>
+          <el-select v-model="edit_attendance_data.action" placeholder="Select">
+           <el-option
+             v-for="item in type"
+             :key="item.value"
+             :label="item.label"
+             :value="item.value">
+           </el-option>
+         </el-select>
       </a-modal>
   </section>
 </template>
@@ -137,6 +152,12 @@ export default {
             manage_qr_modal: false,
             attendance_data: [],
             attendance_modal: false,
+            edit_attendance_data: {},
+            edit_attendance_modal: false,
+            type: [
+                {label: 'Check In', value: 'check_in'},
+                {label: 'Check Out', value: 'check_out'}
+            ],
             resend_qr: false,
             loading: true
         }
@@ -145,6 +166,33 @@ export default {
         this.getKidsListing()
     },
     methods: {
+        editAttendance() {
+            this.loading = true
+            this.$axios.put(`access/${this.edit_attendance_data.id}`, {
+                datetime: this.edit_attendance_data.created_at,
+                action: this.edit_attendance_data.action
+            })
+            .then((res) => {
+                console.warn(res.data);
+                // this.kids = res.data
+                this.loading = false
+                this.edit_attendance_modal = false
+                this.getKidsListing()
+                this.$Swal.fire({
+                    type: 'success',
+                    text: `Attendance successfully updated`,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(()=> {
+                    this.attendance_modal = false
+                })
+            })
+        },
+        editAttendanceModal(data) {
+            this.edit_attendance_modal = true
+            this.edit_attendance_data = _.cloneDeep(data)
+            this.edit_attendance_data.created_at = this.$moment.utc(this.edit_attendance_data.created_at).local().format('YYYY/MM/DD HH:mm:ss')
+        },
         search(value) {
             this.loading = true
             this.$axios.get(`search/${value}`)
@@ -163,7 +211,7 @@ export default {
         },
         convertToTime(val) {
             if(val) {
-                return this.$moment.utc(val).local().format('hh:mm')
+                return this.$moment.utc(val).local().format('DD/MM/YYYY HH:mm:ss')
             } else {
                 return '-'
             }
@@ -237,7 +285,8 @@ export default {
             });
 
             let grouped = _.groupBy(data.attendance, 'date');
-            this.attendance_data = grouped
+            this.attendance_data = []
+            this.attendance_data = _.cloneDeep(grouped)
             this.attendance_modal = true
         },
         deleteKid(data){
@@ -321,7 +370,7 @@ export default {
 }
 
 .table-header span, .table-row span {
-    width: 25%;
+    width: 50%;
     padding: 15px;
 }
 

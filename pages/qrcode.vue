@@ -13,15 +13,15 @@
                     <img :src="kid.picture" alt="">
                 </div>
                 <div class="flex justify-center mb-4">
-                    <span class="w-1/2 text-right pr-2">Name:</span>
+                    <span class="w-1/2 text-right font-bold pr-2">Name:</span>
                     <span class="w-1/2 text-left">{{ kid.name }}</span>
                 </div>
                 <div class="flex justify-center mb-4">
-                    <span class="w-1/2 text-right pr-2">Gender:</span>
+                    <span class="w-1/2 text-right font-bold pr-2">Gender:</span>
                     <span class="w-1/2 text-left">{{ kid.gender }}</span>
                 </div>
                 <div class="flex justify-center mb-4">
-                    <span class="w-1/2 text-right pr-2">Birth Date:</span>
+                    <span class="w-1/2 text-right font-bold pr-2">Birth Date:</span>
                     <span class="w-1/2 text-left">{{ kid.birthdate }}</span>
                 </div>
                 <div class="flex justify-center mb-4" v-if="getWeek(kid.birthdate)">
@@ -29,15 +29,22 @@
                     <span class="w-1/2 text-left text-red-600">{{ getWeek(kid.birthdate) }}</span>
                 </div>
                 <div class="flex justify-center mb-4">
-                    <span class="w-1/2 text-right pr-2">Allergies:</span>
+                    <span class="w-1/2 text-right font-bold pr-2">Allergies:</span>
                     <span class="w-1/2 text-left">{{ kid.allergies }}</span>
+                </div>
+                <div class="flex justify-center mb-4">
+                    <span class="w-1/2 text-right font-bold pr-2">Last {{ _.replace(kid.attendance.action, '_', ' ') }}:</span>
+                    <span class="w-1/2 text-left">{{ $moment.utc(kid.attendance.created_at).local().format('DD/MM/YYYY hh:mm a') }}</span>
                 </div>
                 <div class="mx-auto">
                     <button class="button--grey" @click="rescan()">
                         Rescan QR Code
                     </button>
-                    <button class="button--grey" :disabled="action.length == 0" @click="manageAttendance()">
-                        Check {{ action }}
+                    <button class="button--grey" @click="manageAttendance('check_in')">
+                        Check In
+                    </button>
+                    <button class="button--grey" @click="manageAttendance('check_out')">
+                        Check Out
                     </button>
                 </div>
             </div>
@@ -73,17 +80,7 @@ export default {
           this.kid = {}
           this.loading = true
       },
-      manageAttendance() {
-          let action = ''
-          switch (this.action) {
-              case 'In':
-              action = 'check_in';
-              break;
-              case 'Out':
-              action = 'check_out';
-              break;
-              default:
-          }
+      manageAttendance(action) {
 
           this.$axios.post(`access/manageAttendance`, {
               kid_id: this.kid.id,
@@ -92,7 +89,7 @@ export default {
           .then((res) => {
               this.$Swal.fire({
                   type: 'success',
-                  text: `${this.kid.name} has check ${this.action.toLowerCase()} successfully`,
+                  text: `${this.kid.name} has ${_.replace(action, '_', ' ')} successfully`,
                   showConfirmButton: false,
                   timer: 2000
               }).then(()=> {

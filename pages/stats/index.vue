@@ -25,22 +25,24 @@
               <table :id="`attendance${key}`" class="attendance w-full border bg-white">
                   <tr class="border">
                       <th>Kid Name</th>
-                      <th>Check In Time</th>
-                      <th>Check In Method</th>
-                      <th>Check Out Time</th>
-                      <th>Check Out Method</th>
+                      <th>Date Time</th>
+                      <th>Action</th>
                   </tr>
                   <tr class="border trans" v-for="(x, index) in item">
-                      <td>{{ _.get(_.head(x), ['kid', 'name']) }}</td>
-                      <td>{{ convertToTime(_.get(_.find(x, {'action': 'check_in'}), 'created_at')) }}</td>
+                      <td>{{ _.get(x, ['kid', 'name']) }}</td>
+                      <td>{{ convertToTime(_.get(x, 'created_at')) }}</td>
+                      <td>{{ _.capitalize(_.get(x, 'checkin_method')) }} {{ _.replace(_.get(x, 'action'), '_', ' ') }}</td>
+                      <!-- <td>{{ convertToTime(_.get(_.find(x, {'action': 'check_in'}), 'created_at')) }}</td>
                       <td>{{ _.get(_.find(x, {'action': 'check_in'}), 'checkin_method') || '-' }}</td>
                       <td>{{ convertToTime(_.get(_.find(x, {'action': 'check_out'}), 'created_at')) }}</td>
-                      <td>{{ _.get(_.find(x, {'action': 'check_out'}), 'checkin_method') || '-' }}</td>
+                      <td>{{ _.get(_.find(x, {'action': 'check_out'}), 'checkin_method') || '-' }}</td> -->
                   </tr>
                   <tr class="border trans">
                       <td>Total:</td>
-                      <td :colspan="3"></td>
-                      <td>{{ Object.keys(item).length }} {{Object.keys(item).length > 1 ? 'kids' : 'kid'}}</td>
+                      <td :colspan="2" class="text-right">
+                          {{ Object.keys(item).length }} {{Object.keys(item).length > 1 ? 'records' : 'record'}}
+                          {{ Object.keys(grouped_attendance[key]).length }} {{Object.keys(grouped_attendance[key]).length > 1 ? 'kids' : 'kid'}}
+                      </td>
                   </tr>
               </table>
               <div class="flex justify-end py-2">
@@ -74,6 +76,7 @@ export default {
     data() {
         return {
             attendance: {},
+            grouped_attendance: {},
             datacollection: {},
             datacollection2: {},
             loading: true,
@@ -100,7 +103,7 @@ export default {
         },
         convertToTime(val) {
             if(val) {
-                return this.$moment.utc(val).local().format('hh:mm')
+                return this.$moment.utc(val).local().format('DD/MM/YYYY HH:mm:ss')
             } else {
                 return '-'
             }
@@ -117,14 +120,13 @@ export default {
                 kid: kidFilter || []
             })
             .then((res) => {
-                let grouped_data = []
                 let data = []
-                this.attendance = {}
+                this.attendance = res.data
                 _.forEach(res.data, (value, key)=> {
-                    this.attendance[key] = _.groupBy(value, 'kid_id');
-                    data.push(Object.keys(this.attendance[key]).length)
+                    this.grouped_attendance[key] = _.groupBy(value, 'kid_id');
+                    data.push(Object.keys(this.grouped_attendance[key]).length)
                 });
-                let keys = _.keys(this.attendance)
+                let keys = _.keys(this.grouped_attendance)
 
                 this.datacollection = {
                   //Data to be represented on x-axis

@@ -48,7 +48,8 @@ export default {
     '~/plugins/qrcode',
     '~/plugins/cropper',
     '~/plugins/lodash',
-    '~/plugins/sweet-alert'
+    '~/plugins/sweet-alert',
+    '~/plugins/element'
   ],
 
   /*
