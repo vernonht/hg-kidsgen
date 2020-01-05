@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-center">
         <figure>
-            <img src="/kidsgen_logo.png" class="w-auto h-56 md:w-56 md:h-auto" alt="">
+            <img src="/Kids-Gen-Logo.png" class="w-auto h-56 md:w-64 md:h-auto" alt="">
         </figure>
     </div>
   <!-- <div class="VueToNuxtLogo">
