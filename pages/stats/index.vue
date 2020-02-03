@@ -77,6 +77,8 @@ export default {
         return {
             attendance: {},
             grouped_attendance: {},
+            boys_attendance: {},
+            girls_attendance: {},
             datacollection: {},
             datacollection2: {},
             loading: true,
@@ -121,10 +123,16 @@ export default {
             })
             .then((res) => {
                 let data = []
+                let boys = []
+                let girls = []
                 this.attendance = res.data
                 _.forEach(res.data, (value, key)=> {
                     this.grouped_attendance[key] = _.groupBy(value, 'kid_id');
                     data.push(Object.keys(this.grouped_attendance[key]).length)
+                    this.boys_attendance[key] = _.groupBy(_.filter(value, function(o) { return o.kid.gender == 'male'; }), 'kid_id');
+                    boys.push(Object.keys(this.boys_attendance[key]).length)
+                    this.girls_attendance[key] = _.groupBy(_.filter(value, function(o) { return o.kid.gender == 'female'; }), 'kid_id');
+                    girls.push(Object.keys(this.girls_attendance[key]).length)
                 });
                 let keys = _.keys(this.grouped_attendance)
 
@@ -162,6 +170,24 @@ export default {
                             borderColor: '#f87979',
                             //Data to be represented on y-axis
                             data: data,
+                            fill: false,
+                            lineTension: 0
+                        },
+                        {
+                            label: 'Boys',
+                            backgroundColor: 'blue',
+                            borderColor: 'blue',
+                            //Data to be represented on y-axis
+                            data: boys,
+                            fill: false,
+                            lineTension: 0
+                        },
+                        {
+                            label: 'Girls',
+                            backgroundColor: 'pink',
+                            borderColor: 'pink',
+                            //Data to be represented on y-axis
+                            data: girls,
                             fill: false,
                             lineTension: 0
                         }

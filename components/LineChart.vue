@@ -25,7 +25,7 @@
                         min: 0,
                         stepSize: 1
                     },
-                    stacked: true,
+                    stacked: false,
                     gridLines: {
                         display: true
                     }
