@@ -38,16 +38,16 @@
 
                   <span class="col-span-2 md:col-span-1">Points</span>
                   <span class="col-span-3 md:col-span-3">{{sumPoints(item.points)}}</span>
-                  <button type="button" class="col-end-6 col-span-5 md:col-span-1" @click="editPointsModal(item)">
+                  <button type="button" class="col-end-6 col-span-5 md:col-span-1" @click="managePointsModal(item)">
                       <a-icon type="smile" theme="twoTone" />
                       <span class="pl-2">Points</span>
                   </button>
 
                   <span class="col-span-5 font-bold">Parent details</span>
-                  <span class="col-span-5 grid grid-col-1 md:grid-cols-3 gap-2 py-2 md:py-0" v-for="p in item.kid_parents">
-                      <span>{{ _.get(_.find(parents, {id: p.parent_id}), 'name') }}</span>
-                      <a :href="`tel:${ _.get(_.find(parents, {id: p.parent_id}), 'contact') }`">{{ _.get(_.find(parents, {id: p.parent_id}), 'contact') }}</a>
-                      <a :href="`mailto:${ _.get(_.find(parents, {id: p.parent_id}), 'email') }`">{{ _.get(_.find(parents, {id: p.parent_id}), 'email') }}</a>
+                  <span class="col-span-5 grid grid-col-1 md:grid-cols-3 gap-2 py-2 md:py-0" v-for="p in item.kid_parents" :key="p.parent_id">
+                      <span>{{ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'name') }}</span>
+                      <a :href="`tel:${ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'contact') }`">{{ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'contact') }}</a>
+                      <a :href="`mailto:${ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'email') }`">{{ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'email') }}</a>
                   </span>
 
                   <button type="button" class="col-span-5 md:col-span-2 lg:col-span-1" @click="manageQRModal(item)">
@@ -140,7 +140,7 @@
            </el-option>
          </el-select>
       </a-modal>
-      <a-modal title="Manage Points" :visible="edit_points_modal" :confirmLoading="loading" @ok="editPoints" @cancel="edit_points_modal = false">
+      <a-modal title="Manage Points" :visible="edit_points_modal" :confirmLoading="loading" @ok="managePoints" @cancel="edit_points_modal = false">
           <div class="grid grid-cols-3 gap-4 mb-4">
               <span class="col-span-1">Name</span>
               <span class="col-span-2">{{_.get(edit_points_data.kid, ['name'])}}</span>
@@ -160,13 +160,29 @@
               </div>
 
           </div>
-          <a-collapse v-model="active_point_history">
+          <a-collapse v-model="active_points_history">
               <a-collapse-panel header="Points History" key="1">
                   <a-timeline mode="alternate">
-                      <a-timeline-item :color="_.get(h, ['points']) > 0 ? 'green':'red'" v-for="h in _.get(edit_points_data, ['kid', 'points'])">
-                          <a-tag :color="_.get(h, ['points']) > 0 ? 'green':'red'">{{ _.get(h, ['points']) }}</a-tag>
-                          <span>{{ _.get(h, ['description']) }}</span>
-                          <span>{{ _.get(h, ['created_at']) | moment('DD-MM-YYYY') }}</span>
+                      <a-timeline-item :color="_.get(h, ['points']) > 0 ? 'green':'red'" v-for="h in _.get(edit_points_data, ['kid', 'points'])" :key="h.id">
+                          <div class="" v-if="edit_points != h.id">
+                              <a-tag :color="_.get(h, ['points']) > 0 ? 'green':'red'">{{ _.get(h, ['points']) }}</a-tag>
+                              <span>{{ _.get(h, ['description']) }}</span>
+                              <span>{{ _.get(h, ['created_at']) | moment('DD-MM-YYYY') }}</span>
+                              <a-button type="primary" size="small" icon="edit" @click="editPointsHistory(h)"></a-button>
+                              <a-popconfirm :title="`Delete points?`" @confirm="submitPointsHistory('delete', h.id)" okText="Yes" cancelText="No">
+                                  <a-button type="danger" size="small" icon="delete"  :loading="loading"></a-button>
+                              </a-popconfirm>
+                          </div>
+                          <div class="grid gap-2" v-if="edit_points == h.id">
+                              <a-input-number id="points" :max="100" v-model="edit_points_history.points" />
+                              <a-textarea
+                              v-model="edit_points_history.description"
+                              placeholder="Briefly tell us why"
+                              :autoSize="{ minRows: 2, maxRows: 3 }"
+                              />
+                              <a-button type="primary" size="small" @click="submitPointsHistory('edit')" :loading="loading">Update</a-button>
+                              <a-button  size="small" @click="edit_points = ''">Cancel</a-button>
+                          </div>
                       </a-timeline-item>
                   </a-timeline>
               </a-collapse-panel>
@@ -189,7 +205,6 @@ export default {
             edit_attendance_data: {},
             edit_attendance_modal: false,
             edit_points_data: {
-                data: {},
                 id: '',
                 points: '',
                 description: ''
@@ -201,22 +216,79 @@ export default {
             ],
             resend_qr: false,
             loading: true,
-            active_point_history: []
+            active_points_history: [],
+            edit_points: '',
+            edit_points_history: {
+                points: 0,
+                description: ''
+            }
         }
     },
     mounted() {
         this.getKidsListing()
     },
     methods: {
-        editPointsModal(data) {
+        async submitPointsHistory(type, delete_id) {
+                try {
+                    if(type == 'edit') {
+                        this.loading = true
+                        let res = await this.$axios.put(`/points/${this.edit_points}`, {
+                            points: this.edit_points_history.points,
+                            description: this.edit_points_history.description
+                        })
+                        // Update existing data
+                        this.edit_points_data.kid.points[_.findIndex(this.edit_points_data.kid.points, {id: res.data.id})] = res.data
+                        this.edit_points = ''
+                        this.getKidsListing()
+                        this.$Swal.fire({
+                            type: 'success',
+                            text: `Points successfully changed`,
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                    }
+                    else if (type == 'delete') {
+                        this.loading = true
+                        let res = await this.$axios.delete(`/points/${delete_id}`,)
+                        // Delete existing data
+                        this.edit_points_data.kid.points.splice(_.findIndex(this.edit_points_data.kid.points, {id: res.data.id}), 1);
+                        this.edit_points = ''
+                        this.getKidsListing()
+                        this.$Swal.fire({
+                            type: 'success',
+                            text: `Points successfully deleted`,
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                    }
+                } catch (e) {
+                    this.loading = false
+                } finally {
+                    this.loading = false
+                }
+        },
+        editPointsHistory(data) {
+            this.edit_points = data.id
+            this.edit_points_history.points = data.points
+            this.edit_points_history.description = data.description
+        },
+        managePointsModal(data) {
             this.edit_points_modal = true
             this.edit_points_data.kid = data
             this.edit_points_data.points = 0
             this.edit_points_data.description = ''
         },
-        editPoints() {
+        managePoints() {
+            if(!this.edit_points_data.points) {
+                this.$Swal.fire({
+                  type: 'error',
+                  title: 'Oops...',
+                  text: 'Point cannot be 0!'
+                })
+                return
+            }
             this.loading = true
-            this.$axios.post(`points/`, {
+            this.$axios.post(`points`, {
                 kid_id: this.edit_points_data.kid.id,
                 points: this.edit_points_data.points,
                 description: this.edit_points_data.description,
