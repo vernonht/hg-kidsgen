@@ -1,5 +1,5 @@
 <template>
-    <a-modal title="Login" :footer="null" v-model="visible" :afterClose="handleClose">
+    <a-modal title="Login" :footer="null" v-model.sync="visible" :afterClose="handleClose">
         <a-form :form="form" @submit="handleSubmit" >
             <a-form-item :validate-status="userNameError() ? 'error' : ''" :help="userNameError() || ''" >
                 <a-input v-decorator="[ 'email', {rules: [{ required: true, message: 'Please input your email!' }]} ]" placeholder="Email" >
@@ -7,9 +7,9 @@
                 </a-input>
             </a-form-item>
             <a-form-item :validate-status="passwordError() ? 'error' : ''" :help="passwordError() || ''" >
-                <a-input v-decorator="[ 'password', {rules: [{ required: true, message: 'Please input your Password!' }]} ]" type="password" placeholder="Password" >
+                <a-input-password v-decorator="[ 'password', {rules: [{ required: true, message: 'Please input your Password!' }]} ]" type="password" placeholder="Password" >
                     <a-icon slot="prefix" type="lock" style="color:rgba(0,0,0,.25)" />
-                </a-input>
+                </a-input-password>
             </a-form-item>
             <a-form-item>
                 <a-button type="primary" html-type="submit" :loading="loggingin" :disabled="hasErrors(form.getFieldsError())" >
@@ -21,13 +21,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import { Input, Form, Icon, Modal } from 'ant-design-vue'
-
-Vue.use(Input);
-Vue.use(Form);
-Vue.use(Icon);
-Vue.use(Modal);
 function hasErrors (fieldsError) {
     return Object.keys(fieldsError).some(field => fieldsError[field]);
 }
@@ -68,7 +61,6 @@ export default {
             this.form.validateFields((err, values) => {
                 if (!err) {
                     this.loggingin = true
-                    console.log('Received values of form: ', values);
                     this.$axios.post(`/login`, {
                         email: values.email,
                         password: values.password
@@ -89,12 +81,16 @@ export default {
                         // this.$message.success(`${res.data.user.name} has logged in successfully`, 2);
                     })
                     .catch((e)=> {
+                        console.warn(e.response);
                         if(e.response.status == 401) {
                             this.$Swal.fire({
                               type: 'error',
                               title: 'Oops...',
                               text: 'Invalid email or password!'
                             })
+                            this.form.setFieldsValue({
+                                password: ``,
+                            });
                             // this.$message.error(`Invalid email or password`, 2);
                         } else {
                             this.$Swal.fire({

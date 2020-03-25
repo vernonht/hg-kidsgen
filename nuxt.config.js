@@ -34,7 +34,7 @@ export default {
   ** Global CSS
   */
   css: [
-    '~/assets/css/tailwind.css'
+    '~/assets/scss/tailwind.scss'
   ],
 
   /*
@@ -75,6 +75,14 @@ export default {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
+        config.module.rules.push({
+            test: /\.less$/,
+            loader: "less-loader",
+            options: {
+                javascriptEnabled: true,
+                "modifyVars": { "primary-color": "#1cacd7" }
+            }
+        })
     }
   }
 }

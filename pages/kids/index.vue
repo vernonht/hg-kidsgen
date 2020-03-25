@@ -7,52 +7,67 @@
               </div>
               <div class="ml-auto">
                   <nuxt-link to="/kids/create">
-                      <a-button type="primary">
+                      <button>
                           Add new kid
-                      </a-button>
+                      </button>
                   </nuxt-link>
               </div>
           </div>
-          <div class="flex flex-col md:flex-row bg-white rounded-lg shadow-md hover:shadow-lg md:h-56 mb-4 trans" v-for="(item, index) in kids">
-              <div class="md:w-1/4 flex items-start justify-center border border-r overflow-hidden">
-                  <img :src="item.picture" alt="" slot="cover">
+          <div class="flex flex-col md:flex-row bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg mb-4 trans" v-for="(item, index) in kids">
+              <div class="md:w-1/4 flex items-center justify-center border overflow-hidden">
+                  <div class="" v-if="item.picture">
+                      <img :src="item.picture" alt="" slot="cover" >
+                  </div>
+                  <a-avatar shape="round" :size="128" icon="user" style="display: flex; justify-content: center; align-items: center" v-else/>
               </div>
-              <div class="md:w-3/4 p-6 my-auto">
-                  <div class="flex">
-                      <span class="w-16 text-left">Name:</span>{{ item.name }}
-                  </div>
-                  <div class="flex">
-                      <span class="w-16 text-left">Gender:</span>{{ _.capitalize(item.gender) }}
-                  </div>
-                  <div class="flex">
-                      <span class="w-16 text-left">DOB:</span>{{ item.birthdate | moment('DD-MM-YYYY') }}
-                  </div>
-                  <div class="flex">
-                      <span class="w-16 text-left">Age:</span>{{ diff(item.birthdate) }}
-                  </div>
-                  <div class="flex mb-4">
-                      <span class="w-16 text-left">Allergies:</span>{{ item.allergies }}
-                  </div>
-                  <div class="flex flex-col md:flex-row my-auto">
-                      <button type="button" name="button" class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 mb-4 md:mr-4" @click="manageQRModal(item)">
-                          <a-icon type="qrcode"/>
-                          <span class="pl-2">Show QR</span>
+              <div class="md:w-3/4 p-6 my-auto text-left grid grid-cols-5 gap-2">
+                  <span class="col-span-2 md:col-span-1">Name:</span>
+                  <span class="col-span-3 md:col-span-4">{{ item.name }}</span>
+
+                  <span class="col-span-2 md:col-span-1">Gender:</span>
+                  <span class="col-span-3 md:col-span-4">{{ _.capitalize(item.gender) }}</span>
+
+                  <span class="col-span-2 md:col-span-1">DOB:</span>
+                  <span class="col-span-3 md:col-span-4">{{ item.birthdate | moment('DD-MM-YYYY') }}</span>
+
+                  <span class="col-span-2 md:col-span-1">Age:</span>
+                  <span class="col-span-3 md:col-span-4">{{ diff(item.birthdate) }}</span>
+
+                  <span class="col-span-2 md:col-span-1">Allergies:</span>
+                  <span class="col-span-3 md:col-span-4">{{ item.allergies }}</span>
+
+                  <span class="col-span-2 md:col-span-1">Points</span>
+                  <span class="col-span-3 md:col-span-3">{{sumPoints(item.points)}}</span>
+                  <button type="button" class="col-end-6 col-span-5 md:col-span-1" @click="editPointsModal(item)">
+                      <a-icon type="smile" theme="twoTone" />
+                      <span class="pl-2">Points</span>
+                  </button>
+
+                  <span class="col-span-5 font-bold">Parent details</span>
+                  <span class="col-span-5 grid grid-col-1 md:grid-cols-3 gap-2 py-2 md:py-0" v-for="p in item.kid_parents">
+                      <span>{{ _.get(_.find(parents, {id: p.parent_id}), 'name') }}</span>
+                      <a :href="`tel:${ _.get(_.find(parents, {id: p.parent_id}), 'contact') }`">{{ _.get(_.find(parents, {id: p.parent_id}), 'contact') }}</a>
+                      <a :href="`mailto:${ _.get(_.find(parents, {id: p.parent_id}), 'email') }`">{{ _.get(_.find(parents, {id: p.parent_id}), 'email') }}</a>
+                  </span>
+
+                  <button type="button" class="col-span-5 md:col-span-2 lg:col-span-1" @click="manageQRModal(item)">
+                      <a-icon type="qrcode"/>
+                      <span class="pl-2">Show QR</span>
+                  </button>
+                  <button type="button" class="col-span-5 md:col-span-2 lg:col-span-1" @click="attendanceModal(item)">
+                      <a-icon type="check-square" theme="twoTone" twoToneColor="#52c41a"/>
+                      <span class="pl-2">Attendance</span>
+                  </button>
+                  <button type="button" class="col-span-5 md:col-span-2 lg:col-span-1" @click="$router.push(`/kids/${item.id}`)">
+                      <a-icon type="edit"/>
+                      <span class="pl-2">Edit Info</span>
+                  </button>
+                  <a-popconfirm :title="`Delete ${item.name}?`" @confirm="deleteKid(item)" okText="Yes" cancelText="No">
+                      <button class="cursor-pointer col-span-5 md:col-span-2 lg:col-span-1">
+                          <a-icon type="delete" theme="twoTone" twoToneColor="#eb2f96"/>
+                          <span class="pl-2">Delete</span>
                       </button>
-                      <button type="button" name="button" class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 mb-4 md:mr-4" @click="attendanceModal(item)">
-                          <a-icon type="check-square"/>
-                          <span class="pl-2">Attendance</span>
-                      </button>
-                      <button type="button" name="button" class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 mb-4 md:mr-4" @click="$router.push(`/kids/${item.id}`)">
-                          <a-icon type="edit"/>
-                          <span class="pl-2">Edit Info</span>
-                      </button>
-                      <a-popconfirm :title="`Delete ${item.name}?`" @confirm="deleteKid(item)" okText="Yes" cancelText="No">
-                          <div class="flex items-center border rounded bg-gray-100 hover:bg-gray-200 trans px-4 py-2 mb-4 cursor-pointer">
-                              <a-icon type="delete"/>
-                              <span class="pl-2">Delete</span>
-                          </div>
-                      </a-popconfirm>
-                  </div>
+                  </a-popconfirm>
               </div>
           </div>
       </a-spin>
@@ -115,7 +130,6 @@
           </div>
       </a-modal>
       <a-modal title="Attendance" :visible="edit_attendance_modal" :confirmLoading="loading" @ok="editAttendance" @cancel="edit_attendance_modal = false">
-          <p>{{ edit_attendance_data }}</p>
           <el-date-picker v-model="edit_attendance_data.created_at" type="datetime" placeholder="Select date and time"></el-date-picker>
           <el-select v-model="edit_attendance_data.action" placeholder="Select">
            <el-option
@@ -126,46 +140,102 @@
            </el-option>
          </el-select>
       </a-modal>
+      <a-modal title="Manage Points" :visible="edit_points_modal" :confirmLoading="loading" @ok="editPoints" @cancel="edit_points_modal = false">
+          <div class="grid grid-cols-3 gap-4 mb-4">
+              <span class="col-span-1">Name</span>
+              <span class="col-span-2">{{_.get(edit_points_data.kid, ['name'])}}</span>
+
+              <span class="col-span-1">Points</span>
+              <div class="col-span-2">
+                  <a-input-number id="points" :max="100" v-model="edit_points_data.points" />
+              </div>
+
+              <span class="col-span-1">Description</span>
+              <div class="col-span-2">
+                  <a-textarea
+                  v-model="edit_points_data.description"
+                  placeholder="Briefly tell us why"
+                  :autoSize="{ minRows: 2, maxRows: 5 }"
+                  />
+              </div>
+
+          </div>
+          <a-collapse v-model="active_point_history">
+              <a-collapse-panel header="Points History" key="1">
+                  <a-timeline mode="alternate">
+                      <a-timeline-item :color="_.get(h, ['points']) > 0 ? 'green':'red'" v-for="h in _.get(edit_points_data, ['kid', 'points'])">
+                          <a-tag :color="_.get(h, ['points']) > 0 ? 'green':'red'">{{ _.get(h, ['points']) }}</a-tag>
+                          <span>{{ _.get(h, ['description']) }}</span>
+                          <span>{{ _.get(h, ['created_at']) | moment('DD-MM-YYYY') }}</span>
+                      </a-timeline-item>
+                  </a-timeline>
+              </a-collapse-panel>
+          </a-collapse>
+      </a-modal>
   </section>
 </template>
 
 <script>
-import Vue from 'vue'
-import { List, Card, Spin, Popconfirm } from 'ant-design-vue'
-import VueCropper from 'vue-cropperjs';
-import 'cropperjs/dist/cropper.css';
-
-Vue.use(List);
-Vue.use(Card);
-Vue.use(Spin);
-Vue.use(Popconfirm);
-
 export default {
-    components: {
-        VueCropper
-    },
     middleware: 'authenticated',
     data() {
         return {
             kids: [],
+            parents: [],
             modal_data: {},
             manage_qr_modal: false,
             attendance_data: [],
             attendance_modal: false,
             edit_attendance_data: {},
             edit_attendance_modal: false,
+            edit_points_data: {
+                data: {},
+                id: '',
+                points: '',
+                description: ''
+            },
+            edit_points_modal: false,
             type: [
                 {label: 'Check In', value: 'check_in'},
                 {label: 'Check Out', value: 'check_out'}
             ],
             resend_qr: false,
-            loading: true
+            loading: true,
+            active_point_history: []
         }
     },
     mounted() {
         this.getKidsListing()
     },
     methods: {
+        editPointsModal(data) {
+            this.edit_points_modal = true
+            this.edit_points_data.kid = data
+            this.edit_points_data.points = 0
+            this.edit_points_data.description = ''
+        },
+        editPoints() {
+            this.loading = true
+            this.$axios.post(`points/`, {
+                kid_id: this.edit_points_data.kid.id,
+                points: this.edit_points_data.points,
+                description: this.edit_points_data.description,
+            })
+            .then((res) => {
+                this.loading = false
+                this.getKidsListing()
+                this.$Swal.fire({
+                    type: 'success',
+                    text: `Points successfully ${this.edit_points_data.points > 0 ? 'added':'deducted'}`,
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(()=> {
+                    this.edit_points_modal = false
+                })
+            }).catch((e)=> {
+                this.loading = false
+            })
+        },
         editAttendance() {
             this.loading = true
             this.$axios.put(`access/${this.edit_attendance_data.id}`, {
@@ -186,6 +256,8 @@ export default {
                 }).then(()=> {
                     this.attendance_modal = false
                 })
+            }).catch((e)=> {
+                this.loading = false
             })
         },
         editAttendanceModal(data) {
@@ -199,6 +271,8 @@ export default {
             .then((res) => {
                 // console.warn(res.data);
                 this.kids = res.data
+                this.loading = false
+            }).catch((e)=> {
                 this.loading = false
             })
         },
@@ -230,6 +304,8 @@ export default {
                 })
                 // this.$message.success(`QR code sent`, 2);
                 // console.warn(res.data);
+            }).catch((e)=> {
+                this.loading = false
             })
         },
         adminCheckIn(action) {
@@ -254,25 +330,9 @@ export default {
                 });
                 // this.$message.success(`${this.modal_data.name} has check ${cta} successfully`, 2);
                 // console.warn(res.data);
+            }).catch((e)=> {
+                this.loading = false
             })
-        },
-        setImage(e) {
-            const file = e.target.files[0];
-            if (!file.type.includes('image/')) {
-                alert('Please select an image file');
-                return;
-            }
-            if (typeof FileReader === 'function') {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    this.imgSrc = event.target.result;
-                    // rebuild cropperjs with the updated source
-                    this.$refs.cropper.replace(event.target.result);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert('Sorry, FileReader API not supported');
-            }
         },
         manageQRModal(data) {
             this.modal_data = data
@@ -301,20 +361,33 @@ export default {
                     this.getKidsListing()
                 });
                 // this.$message.success(`Deleted ${data.name}`, 2);
-            })
-        },
-        getKidsListing(){
-            this.$axios.get('/kids')
-            .then((res) => {
-                // console.warn(res);
-                this.kids = res.data
+            }).catch((e)=> {
                 this.loading = false
             })
+        },
+        async getKidsListing(){
+            try {
+                let res = await this.$axios.get('/kids')
+                this.kids = res.data
+                let res2 = await this.$axios.get('/parents')
+                this.parents = res2.data
+            } catch (e) {
+                this.loading = false
+            } finally {
+                this.loading = false
+            }
         },
         diff(date){
             let a = this.$moment();
             let b = this.$moment(date);
             return a.diff(b, 'years')
+        },
+        sumPoints(data){
+            let res = _.reduce(data, function(result, value, key) {
+                result.push(value.points);
+                return result;
+            }, []);
+            return _.sum(res)
         },
         onChange(date, dateString) {
             console.log(date, dateString);
@@ -323,24 +396,18 @@ export default {
 }
 </script>
 
-<style>
-/* Sample `apply` at-rules with Tailwind CSS
-.container {
-@apply min-h-screen flex justify-center items-center text-center mx-auto;
-}
-*/
+<style lang="scss">
 .container {
     margin: 0 auto;
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     text-align: center;
 }
 
 .title {
-    font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     display: block;
     font-weight: 300;
     font-size: 100px;
@@ -383,5 +450,15 @@ export default {
 
 .table-row:hover {
     background-color: #eee;
+}
+
+button{
+    @apply flex items-center justify-center border rounded bg-gray-100 px-4 py-1 transition duration-500;
+    &:hover{
+        @apply bg-gray-200;
+        border-color: #1cacd7;
+        background: #1cacd7;
+        color: white
+    }
 }
 </style>
