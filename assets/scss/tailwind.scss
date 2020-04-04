@@ -85,3 +85,12 @@
 .trans-faster {
     transition-duration: .075s;
 }
+.button{
+    @apply flex items-center justify-center border rounded bg-gray-100 px-4 py-1 transition duration-500;
+    &:hover{
+        @apply bg-gray-200;
+        border-color: #1cacd7;
+        background: #1cacd7;
+        color: white
+    }
+}

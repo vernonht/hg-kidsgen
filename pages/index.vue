@@ -1,5 +1,5 @@
 <template>
-  <section class="container">
+  <section class="container m-auto flex justify-center">
     <div>
       <logo />
       <!-- <h1 class="title">
@@ -8,28 +8,8 @@
       <!-- <h2 class="subtitle">
         Kidsgen attendance system
       </h2> -->
-      <div class="">
-          <nuxt-link to="/qrcode" class="button--grey mx-4" >Check In / Out</nuxt-link>
-      </div>
-      <div class="hidden links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          class="button--green"
-        >Documentation</a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-        >GitHub</a>
-        <nuxt-link
-          to="/barcode"
-          class="button--grey"
-        >Scan Barcode</nuxt-link>
-        <nuxt-link
-          to="/qrcode"
-          class="button--grey"
-        >Scan QR Code</nuxt-link>
+      <div class="flex justify-center">
+          <nuxt-link to="/qrcode" class="button--grey mx-4" >Scan QR</nuxt-link>
       </div>
     </div>
   </section>
@@ -56,14 +36,6 @@ export default {
   @apply min-h-screen flex justify-center items-center text-center mx-auto;
 }
 */
-.container {
-  margin: 0 auto;
-  min-height: calc(100vh - 50px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
 
 .title {
   font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,

@@ -17,7 +17,9 @@
         v-else
         >
         <template v-slot:extra>
-            <a-button type="primary">Back Home</a-button>
+            <nuxt-link to="/">
+                <a-button type="primary">Back Home</a-button>
+            </nuxt-link>
         </template>
     </a-result>
     </div>
