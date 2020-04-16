@@ -24,9 +24,9 @@
 
         <span class="col-span-5 font-bold">Parent details</span>
         <span class="col-span-5 grid grid-col-1 md:grid-cols-3 gap-2 py-2 md:py-0" v-for="p in kid.kid_parents" :key="p.parent_id">
-            <span>{{ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'name') }}</span>
-            <a :href="`tel:${ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'contact') }`">{{ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'contact') }}</a>
-            <a :href="`mailto:${ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'email') }`">{{ _.get(_.find(parents, {id: _.toInteger(p.parent_id)}), 'email') }}</a>
+            <span>{{ _.get(p, 'name') }}</span>
+            <a :href="`tel:${ _.get(p, 'contact') }`">{{ _.get(p, 'contact') }}</a>
+            <a :href="`mailto:${ _.get(p, 'email') }`">{{ _.get(p, 'email') }}</a>
         </span>
 
         <a-modal title="Manage Points" :visible="edit_points_modal" :confirmLoading="loading" @ok="managePoints" @cancel="edit_points_modal = false">
@@ -36,7 +36,7 @@
 
                 <span class="col-span-1">Points</span>
                 <div class="col-span-2">
-                    <a-input-number id="points" :max="100" v-model="edit_points_data.points" />
+                    <a-input-number id="points" :step="0.5" :max="100" v-model="edit_points_data.points" />
                 </div>
 
                 <span class="col-span-1">Description</span>
@@ -90,7 +90,7 @@
 
 <script>
 export default {
-    props: ['kid', 'parents', 'loading'],
+    props: ['kid', 'loading'],
     data() {
         return {
             active_points_history: [],
