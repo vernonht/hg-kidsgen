@@ -181,7 +181,8 @@ export default {
         },
         search(value) {
             this.loading = true
-            this.$axios.get(`search/${value}`)
+            let url = value ? `search/${value}`:`search`
+            this.$axios.get(url)
             .then((res) => {
                 // console.warn(res.data);
                 this.kids = res.data
